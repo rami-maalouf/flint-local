@@ -1,5 +1,9 @@
 # fork origin
 
+## current branding (2026-10-30)
+
+The app is **Flint Local**, and this repository is [flint-local](https://github.com/rami-maalouf/flint-local). This is a display-name and repository rename. Installed identities, App Groups, sync accounts, SQLite data, widget kinds, URL schemes, and EAS project IDs remain unchanged so existing installations update in place. The Expo slug remains `habit-system` to retain the existing EAS project link. Historical names below describe the original forks.
+
 this repository is a full-history fork of ripples.
 
 - origin repo: https://github.com/rami-maalouf/habit-tracker (product name ripples)

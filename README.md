@@ -1,8 +1,12 @@
-# Habit System
+# Flint Local
 
-A private, local-first habit tracker for iOS, built with Expo and React Native. Habit System combines daily habits, same-day stacks, coins, and rewards you define. A fresh install starts empty.
+A private, local-first habit tracker for iOS, built with Expo and React Native. Flint Local combines daily habits, same-day stacks, coins, and rewards you define. A fresh install starts empty.
 
-This is a full-history fork of [Ripples](https://github.com/rami-maalouf/habit-tracker). [FORK.md](FORK.md) records the origin and the separate Habit System app, App Group, and CloudKit identities.
+This is a full-history fork of [Ripples](https://github.com/rami-maalouf/habit-tracker). [FORK.md](FORK.md) records the origin and the separate Flint Local app, App Group, and CloudKit identities.
+
+The app's design direction is monochrome: black, white, and system Liquid Glass, with no fixed accent-color theme.
+
+For the full-stack app with Snapback account sync, see [Flint](https://github.com/rami-maalouf/flint). Both apps keep their existing installed identities and backup format so the rename preserves existing data.
 
 ## The app
 

@@ -1,5 +1,5 @@
 {
-  "name": "habit-system",
+  "name": "flint-local",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {

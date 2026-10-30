@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "habit-system",
+    "name": "Flint Local",
     "slug": "habit-system",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,7 +13,7 @@
       "bundleIdentifier": "studio.orbitlabs.habitsystem",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "CFBundleDisplayName": "Habit System"
+        "CFBundleDisplayName": "Flint Local"
       },
       "appleTeamId": "3V2UU7RRK9"
     },
@@ -52,7 +52,7 @@
           "widgets": [
             {
               "name": "HabitSystemBoards",
-              "displayName": "Habit System",
+              "displayName": "Flint Local",
               "description": "Your boards with seven-day strips and quick check-in.",
               "supportedFamilies": [
                 "systemSmall",
