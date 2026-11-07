@@ -18,13 +18,13 @@
     <link rel="apple-touch-icon" href="./img/icon-180.png" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body class="landing">
+  <body>
     <div class="grain" aria-hidden="true"></div>
 
     <header class="bar">
       <a class="brand" href="#top" aria-label="Flint, top of the page">
         <img src="./img/mark.png" alt="" width="26" height="26" />
-        <span>Flint<span class="brand-note">A little, every day.</span></span>
+        <span>Flint</span>
       </a>
       <nav aria-label="Sections">
         <a href="#why">Why</a>
@@ -36,13 +36,12 @@
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow reveal" style="--d: 0"><span></span> SMALL RITUALS. REAL MOMENTUM.</p>
           <h1 id="hero-title" class="reveal" style="--d: 1">
-            Keep the<br /><span class="title-flame">flame</span> lit<span class="title-period">.</span>
+            Keep the <span class="nowrap">flame lit<img class="full-stop" src="./img/mark.png" alt="" width="64" height="64" /><span class="sr-only">.</span></span>
           </h1>
           <p class="lead reveal" style="--d: 2">
-            A small promise to yourself. A little fuel, every day.
-            Build habits, stack your rituals, and turn showing up into something you can see.
+            Flint is a private habit tracker for iPhone. Check in each day, link habits into
+            stacks, and earn the rewards you set yourself.
           </p>
           <div class="actions reveal" style="--d: 3">
             <a class="button primary" href="https://github.com/rami-maalouf/flint-local">
@@ -64,21 +63,14 @@
 
         <!-- the live flame: each day checked feeds it; scene.js draws it into the canvas -->
         <div class="stage">
-          <div class="scene-heading"><span>THE ANATOMY OF SHOWING UP</span><span>01 / 14</span></div>
-          <div class="scene-orbit" aria-hidden="true"></div>
-          <div class="scene-coordinate" aria-hidden="true">YOUR MOMENTUM,<br />MADE VISIBLE.</div>
-          <div class="habit-fragment fragment-one" aria-hidden="true"><span class="fragment-icon">✓</span><div>Morning ritual<small>3 habits. One good start.</small></div><span class="fragment-value">+30</span></div>
-          <div class="habit-fragment fragment-two" aria-hidden="true"><span class="fragment-icon">↗</span><div>Show up again<small>Small counts. Always.</small></div><span class="fragment-spark">✦</span></div>
           <div class="flame-slot">
             <canvas id="flame" aria-hidden="true"></canvas>
             <!-- without webgl, a still of the flame stands in -->
             <img class="still" src="./img/flame-still.png" alt="" width="360" height="360" />
           </div>
-          <div class="experiment-label"><span>FEED YOUR FLAME</span><span>Tap a day below ↙</span></div>
           <div class="days reveal" style="--d: 5" role="group" aria-label="The last fourteen days. Tap a day to check it in or out." id="days"></div>
           <p class="caption reveal" style="--d: 6" id="caption" aria-live="polite">Each day you check in feeds the flame.</p>
         </div>
-        <div class="hero-footnote"><span>BUILT FOR YOUR LIFE. KEPT ON YOUR IPHONE.</span><a href="#why">A little further down <span>↓</span></a></div>
       </section>
 
       <section id="why" class="why" aria-labelledby="why-title">

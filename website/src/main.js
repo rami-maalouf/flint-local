@@ -28,7 +28,7 @@ document.querySelectorAll(".observe").forEach((el) => seen.observe(el));
 // it, two in a row let it burn down to an ember. it is the app's never-miss-twice rule.
 const DAYS = 14;
 const MISSED = 8;
-const days = Array.from({ length: DAYS }, (_, i) => i < 7);
+const days = Array.from({ length: DAYS }, () => false);
 const listeners = new Set();
 const strip = document.getElementById("days");
 const caption = document.getElementById("caption");
@@ -84,7 +84,6 @@ function update() {
   buttons.forEach((b, i) => b.setAttribute("aria-pressed", String(days[i])));
   const level = flameLevel(days);
   caption.textContent = describe(days);
-  document.querySelector(".scene-heading span:last-child").textContent = `${String(days.filter(Boolean).length).padStart(2, "0")} / 14`;
   document.querySelector(".flame-slot").style.setProperty("--glow", String(0.25 + level * 0.75));
   for (const listen of listeners) listen(level);
 }
@@ -107,7 +106,7 @@ if (reduced) {
   update();
 } else {
   update();
-  tour = setTimeout(() => play(7), 900);
+  setTimeout(() => play(), 900);
 }
 
 // the 3d flame loads after the page has painted. without webgl, the still stays.
