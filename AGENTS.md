@@ -2,7 +2,7 @@ This is an Expo/React Native mobile application. Prioritize mobile-first pattern
 
 ## Product context (read before touching product code)
 
-The current product name is Flint Local; the repository is `rami-maalouf/flint-local`. Preserve the existing bundle IDs, App Groups, EAS slugs/project IDs, URL schemes, sync/account bindings, database names, and backup format during branding changes. The visual direction is monochrome black and white with system Liquid Glass, without a fixed accent-color theme.
+The current product name is Flint Local; the repository is `rami-maalouf/flint-local`. Preserve the existing bundle IDs, App Groups, EAS slugs/project IDs, URL schemes, sync/account bindings, database names, and backup format during branding changes. The visual direction is monochrome black and white with system Liquid Glass, without a fixed accent-color theme. The mark is a glossy flame (Flint Local: aurora, Flint: violet). Every icon, launch, alternate-icon and website picture comes from `brand/` (`cd brand && bun run render`); change the art in `brand/flame.js`, never in the PNGs, and keep `brand/` byte-identical in Flint Local and Flint. Read `docs/brand.md` first.
 
 This repository is the habit-system fork of Ripples. Read in this order:
 

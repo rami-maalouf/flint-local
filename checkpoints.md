@@ -3925,3 +3925,20 @@ convergence remain open. T24 and Checkpoints C/D are not complete.
     development variant also uses its own opaque square icon: the familiar
     droplet wears an orange hard hat in a purple-and-blue palette, while preview
     and production retain the original green icon.
+
+
+## Flame brand - 2026-11-07
+
+Branch `feat/flame-brand`. The aurora flame (turquoise to blue to indigo with a lime core) on a navy studio.
+
+The mark is a glossy flame (the "crown": a tall middle tongue, a flick on each side and an inner flame), drawn as a 2D outline and inflated into toy plastic that glows in its own colours. `brand/` renders every icon, launch, alternate-icon, Android and favicon picture from `brand/flame.js` with headless Brave, at twice the size, scaled down; the app's name picks the palette. `brand/` is byte-identical in Flint Local and Flint (`diff -r` clean). `docs/brand.md` records the concept, palettes and assets.
+
+- The launch flame (transparent, `imageWidth` 180) sits on white in light mode and black in dark mode. `src/platform/launch-screen.ts` holds it from the root layout and home reveals the app once its boards query leaves loading, with a 350 ms fade and a 4 s limit; `tests/product/platform/launch-screen.test.ts` covers hold, reveal, the limit and a refused hold.
+- The icon choices keep their stored ids (`default`, `midnight`, `paper`) with new art: the flame on navy, black and light paper. The picker marks the chosen icon with a ring instead of a "Selected" line, so the tiles keep one height. Development builds use the flame on amber.
+- The rim is built as a band along the outline, so the silhouette is smooth; the earlier grid-only rim was serrated at full size. A re-render of the icon after the speed work measured SSIM 0.9992 against the first render before the rim change.
+- `tests/product/migrations/remote-fact-storage.test.ts` failed on unmodified main: Node 24.13's `node:sqlite` stores text with an embedded null in full but reads it back only to the null. The test now compares the stored bytes as hex, which keeps its intent.
+- Not claimed: a physical-device install, live CloudKit or Snapback behaviour, the 4 s limit firing on a slow database (the simulator database was empty), and a video of the fade.
+
+The website lives in `website/` for flint.orbitlabs.studio: plain HTML, CSS and one module bundled by Bun, Sora, Geist and Geist Mono, and Three.js. Its hero is the app icon's own flame, built live from `../brand/flame.js` (0.15 s in desktop Brave after the field and outline work, down from 1.7 s), over the last fourteen days: they light one by one, one is missed, and the flame grows; tapping a day checks it in or out, one miss dims the flame and two in a row burn it to an ember. Privacy and support pages state only facts checked in the code (no analytics packages, SQLite on the iPhone, CloudKit sync off by default, `expo-updates` checks). Real-time Brave captures through the devtools protocol show the hero, sections, privacy page, two missed days, reduced motion and the no-WebGL still at 1440 by 900 and at a true 390 by 844 phone viewport, with no horizontal overflow. The site calls the app Flint. It is not deployed, and the App Store link waits for the listing.
+
+Evidence: `bun run validate` exits 0 (3109 tests, coverage gates met) before the picker ring change; the settings suites pass after it. On a new dedicated simulator, "Flint Brand QA" (iPhone 17 Pro, iOS 26.5, `7BC11B43-AE75-4CC2-B1A8-605F172BCC3E`), because the simulators AGENTS.md names no longer exist on this Mac, a fresh prebuild and a Release simulator build installed in place show: the home screen icon and name, the light and dark launch reaching home in about 1.8 to 1.9 s, the three icon previews, and a switch to Paper and back to Default. A second Release build with the picker ring shows three tiles of one height, the ring only on the chosen icon in light and dark mode, and the ring following Paper and back. Captures are under `.artifacts/flame-brand/`.
