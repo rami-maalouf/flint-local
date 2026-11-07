@@ -1,6 +1,6 @@
-# Flint Local's website
+# Flint's website
 
-The one-page site for Flint Local at [flint.orbitlabs.studio](https://flint.orbitlabs.studio): what the app does, in a few lines, around the app icon's own flame. The flame is live: the last fourteen days sit under it, they light one by one, one is missed, and the flame grows. Tap a day to check it in or out. One missed day dims the flame; two in a row burn it down to an ember. That is the app's never-miss-twice rule, shown without a word.
+The one-page site for Flint at [flint.orbitlabs.studio](https://flint.orbitlabs.studio): what the app does, in a few lines, around the app icon's own flame. The flame is live: the last fourteen days sit under it, they light one by one, one is missed, and the flame grows. Tap a day to check it in or out. One missed day dims the flame; two in a row burn it down to an ember. That is the app's never-miss-twice rule, shown without a word.
 
 It is plain HTML, CSS and one module, bundled by [Bun](https://bun.sh) into static files. The words and layout load first; the 3D flame is a separate file that loads after the page has painted, draws only while it is on screen, and holds still for readers who ask for reduced motion. Without WebGL, a still of the flame stands in.
 
