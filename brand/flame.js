@@ -33,69 +33,122 @@ const OUTER_RADIUS = 70;
 const INNER_HEIGHT = 30;
 const INNER_RADIUS = 46;
 
-// the path's outline as a dense polyline, a spatial index of its segments, and an inside test
-function outline(d) {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  svg.setAttribute("d", d);
-  const length = svg.getTotalLength();
-  const count = 900;
-  const points = [];
-  for (let i = 0; i < count; i++) {
-    const p = svg.getPointAtLength((i / count) * length);
-    points.push([p.x, p.y]);
-  }
-  const cell = 16;
-  const buckets = new Map();
-  const key = (i, j) => i * 1000 + j;
-  points.forEach(([ax, ay], s) => {
-    const [bx, by] = points[(s + 1) % count];
-    for (let i = Math.floor(Math.min(ax, bx) / cell); i <= Math.floor(Math.max(ax, bx) / cell); i++) {
-      for (let j = Math.floor(Math.min(ay, by) / cell); j <= Math.floor(Math.max(ay, by) / cell); j++) {
-        const k = key(i, j);
-        if (!buckets.has(k)) buckets.set(k, []);
-        buckets.get(k).push(s);
-      }
+// points evenly spaced along a path drawn with absolute M, C and Z commands, as these are
+function samplePath(d, count) {
+  const nums = d.match(/-?[\d.]+/g).map(Number);
+  const [sx, sy] = nums;
+  const fine = [[sx, sy]];
+  for (let k = 2; k + 5 < nums.length; k += 6) {
+    const [x0, y0] = fine[fine.length - 1];
+    const [x1, y1, x2, y2, x3, y3] = nums.slice(k, k + 6);
+    for (let i = 1; i <= 120; i++) {
+      const t = i / 120;
+      const u = 1 - t;
+      fine.push([
+        u * u * u * x0 + 3 * u * u * t * x1 + 3 * u * t * t * x2 + t * t * t * x3,
+        u * u * u * y0 + 3 * u * u * t * y1 + 3 * u * t * t * y2 + t * t * t * y3,
+      ]);
     }
-  });
-  const ctx = document.createElement("canvas").getContext("2d");
-  const path = new Path2D(d);
-  return { points, buckets, cell, key, inside: (x, y) => ctx.isPointInPath(path, x, y) };
+  }
+  const lengths = [0];
+  for (let i = 1; i < fine.length; i++) lengths.push(lengths[i - 1] + Math.hypot(fine[i][0] - fine[i - 1][0], fine[i][1] - fine[i - 1][1]));
+  const total = lengths[lengths.length - 1];
+  const out = [];
+  let i = 1;
+  for (let k = 0; k < count; k++) {
+    const want = (k / count) * total;
+    while (lengths[i] < want) i++;
+    const t = (want - lengths[i - 1]) / (lengths[i] - lengths[i - 1] || 1);
+    out.push([fine[i - 1][0] + (fine[i][0] - fine[i - 1][0]) * t, fine[i - 1][1] + (fine[i][1] - fine[i - 1][1]) * t]);
+  }
+  return out;
 }
 
-// signed distance (positive inside) to the outline, and the nearest point on it
-function field(shape, x, y) {
-  const { points, buckets, cell, key } = shape;
-  const ci = Math.floor(x / cell);
-  const cj = Math.floor(y / cell);
+// the path's outline as a dense polyline, a spatial index of its segments, and an inside test
+function outline(d) {
+  // round each sharp tip by a pixel or two, so the light does not fan out from a point
+  let points = samplePath(d, 900);
+  for (let pass = 0; pass < 4; pass++) {
+    points = points.map(([x, y], i) => {
+      const [ax, ay] = points[(i + points.length - 1) % points.length];
+      const [bx, by] = points[(i + 1) % points.length];
+      return [(ax + 2 * x + bx) / 4, (ay + 2 * y + by) / 4];
+    });
+  }
+  const count = points.length;
+  // a flat grid of buckets, each listing the outline segments that cross it
+  const cell = 16;
+  const side = Math.ceil(512 / cell) + 1;
+  const buckets = Array.from({ length: side * side }, () => []);
+  const clampCell = (v) => Math.max(0, Math.min(side - 1, Math.floor(v / cell)));
+  points.forEach(([ax, ay], s) => {
+    const [bx, by] = points[(s + 1) % count];
+    for (let i = clampCell(Math.min(ax, bx)); i <= clampCell(Math.max(ax, bx)); i++) {
+      for (let j = clampCell(Math.min(ay, by)); j <= clampCell(Math.max(ay, by)); j++) buckets[j * side + i].push(s);
+    }
+  });
+  // which grid points are inside: the path filled once into a canvas with one pixel per point
+  const insideGrid = (grid) => {
+    const n = grid + 1;
+    const step = 512 / grid;
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = n;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.setTransform(1 / step, 0, 0, 1 / step, 0.5, 0.5);
+    ctx.fill(new Path2D(d));
+    const alpha = ctx.getImageData(0, 0, n, n).data;
+    const mask = new Uint8Array(n * n);
+    for (let k = 0; k < mask.length; k++) mask[k] = alpha[k * 4 + 3] > 127 ? 1 : 0;
+    return mask;
+  };
+  return { points, buckets, cell, side, clampCell, insideGrid };
+}
+
+// signed distance (positive inside) to the outline, and the nearest point on it. "floor" is a
+// distance the answer cannot be below (a neighbour's distance less one grid step): rings of
+// buckets that lie wholly inside it cannot hold the nearest segment and are skipped.
+function field(shape, x, y, inside, floor = 0) {
+  const { points, buckets, cell, side, clampCell } = shape;
+  const ci = clampCell(x);
+  const cj = clampCell(y);
   let best = Infinity;
   let near = points[0];
-  for (let ring = 0; ring < 40; ring++) {
+  const visit = (i, j) => {
+    if (i < 0 || j < 0 || i >= side || j >= side) return;
+    for (const s of buckets[j * side + i]) {
+      const [ax, ay] = points[s];
+      const [bx, by] = points[(s + 1) % points.length];
+      const dx = bx - ax;
+      const dy = by - ay;
+      const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)));
+      const px = ax + dx * t;
+      const py = ay + dy * t;
+      const dd = (x - px) ** 2 + (y - py) ** 2;
+      if (dd < best) {
+        best = dd;
+        near = [px, py];
+      }
+    }
+  };
+  const first = Math.max(0, Math.floor(floor / (cell * Math.SQRT2)) - 1);
+  for (let ring = first; ring < side; ring++) {
     // nothing in a further ring can beat the best found so far
     if (best !== Infinity && (ring - 1) * cell > Math.sqrt(best)) break;
-    for (let i = ci - ring; i <= ci + ring; i++) {
-      for (let j = cj - ring; j <= cj + ring; j++) {
-        if (Math.max(Math.abs(i - ci), Math.abs(j - cj)) !== ring) continue;
-        const list = buckets.get(key(i, j));
-        if (!list) continue;
-        for (const s of list) {
-          const [ax, ay] = points[s];
-          const [bx, by] = points[(s + 1) % points.length];
-          const dx = bx - ax;
-          const dy = by - ay;
-          const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)));
-          const px = ax + dx * t;
-          const py = ay + dy * t;
-          const dd = (x - px) ** 2 + (y - py) ** 2;
-          if (dd < best) {
-            best = dd;
-            near = [px, py];
-          }
-        }
-      }
+    if (ring === 0) {
+      visit(ci, cj);
+      continue;
+    }
+    for (let k = -ring; k <= ring; k++) {
+      visit(ci + k, cj - ring);
+      visit(ci + k, cj + ring);
+    }
+    for (let k = -ring + 1; k <= ring - 1; k++) {
+      visit(ci - ring, cj + k);
+      visit(ci + ring, cj + k);
     }
   }
   const d = Math.sqrt(best);
-  return { d: shape.inside(x, y) ? d : -d, near };
+  return { d: inside ? d : -d, near };
 }
 
 // a pillow: a round edge of radius r rising to height h, with a gentle dome inside
@@ -118,115 +171,205 @@ const smooth = (a, b, x) => {
   return t * t * (3 - 2 * t);
 };
 
-// one inflated surface, front and (optionally) back, with exact normals and per-vertex colour
+// one inflated surface, front and (optionally) back, with exact normals and per-vertex colour.
+// it is one height field, sampled two ways that overlap: a band that follows the outline, so
+// the steep rim and the silhouette are smooth, and a grid for the gentle middle.
 function inflate(THREE, d, { grid, height, radius, back = 0.55, base = () => 0, color }) {
   const shape = outline(d);
   const step = 512 / grid;
   const n = grid + 1;
+  const inside = shape.insideGrid(grid);
+  // the grid measures only points inside the shape
   const cells = [];
   let dmax = 1;
   for (let j = 0; j < n; j++) {
     for (let i = 0; i < n; i++) {
       const x = i * step;
       const y = j * step;
-      const f = field(shape, x, y);
+      if (!inside[j * n + i]) {
+        cells.push({ x, y, d: -1, near: [x, y] });
+        continue;
+      }
+      // the point to the left bounds this one's distance, when it was measured
+      const prev = i > 0 && cells[cells.length - 1].d > 0 ? cells[cells.length - 1] : null;
+      const f = field(shape, x, y, true, prev ? prev.d - step : 0);
       cells.push({ x, y, ...f });
       dmax = Math.max(dmax, f.d);
     }
   }
-  const at = (i, j) => cells[j * n + i];
-  // keep the inside, and the outside ring next to it, which snaps onto the outline
-  const keep = new Uint8Array(cells.length);
-  for (let j = 0; j < n; j++) {
-    for (let i = 0; i < n; i++) {
-      if (at(i, j).d <= 0) continue;
-      for (let b = -1; b <= 1; b++) {
-        for (let a = -1; a <= 1; a++) {
-          const ii = i + a;
-          const jj = j + b;
-          if (ii >= 0 && jj >= 0 && ii < n && jj < n) keep[jj * n + ii] = 1;
-        }
+
+  // the band: rows stepping in from the outline, closer together near the rim
+  const reach = radius + 3 * step;
+  const rows = 28;
+  const pts = shape.points;
+  const count = pts.length;
+  let area = 0;
+  for (let s = 0; s < count; s++) {
+    const [ax, ay] = pts[s];
+    const [bx, by] = pts[(s + 1) % count];
+    area += ax * by - bx * ay;
+  }
+  const turn = area > 0 ? 1 : -1;
+  // each column steps in along the outline's inward normal, but only as far as the middle of
+  // the shape: past it, another part of the outline is nearer. columns from both sides meet
+  // there, just overlapping, so thin tips and notches close without cracks.
+  const insideAt = (x, y) => {
+    const i = Math.round(x / step);
+    const j = Math.round(y / step);
+    return i >= 0 && j >= 0 && i < n && j < n && inside[j * n + i] === 1;
+  };
+  const columns = pts.map(([px, py], s) => {
+    const [ax, ay] = pts[(s + count - 1) % count];
+    const [bx, by] = pts[(s + 1) % count];
+    const tx = bx - ax;
+    const ty = by - ay;
+    const tl = Math.hypot(tx, ty) || 1;
+    const nx = (-turn * ty) / tl;
+    const ny = (turn * tx) / tl;
+    const owns = (depth) => {
+      const x = px + nx * depth;
+      const y = py + ny * depth;
+      if (!insideAt(x, y)) return false;
+      const f = field(shape, x, y, true);
+      return Math.hypot(f.near[0] - px, f.near[1] - py) < 1.5 + depth * 0.02;
+    };
+    let lo = 0;
+    let hi = reach;
+    if (!owns(hi)) {
+      for (let it = 0; it < 14; it++) {
+        const mid = (lo + hi) / 2;
+        if (owns(mid)) lo = mid;
+        else hi = mid;
       }
+    } else lo = reach;
+    return { px, py, nx, ny, edge: [tx / tl, ty / tl], depth: Math.min(reach, lo + 2.5) };
+  });
+  const band = [];
+  for (let k = 0; k <= rows; k++) {
+    const t = (k / rows) ** 1.7;
+    for (const col of columns) {
+      if (k === 0) {
+        band.push({ x: col.px, y: col.py, d: 0, near: [col.px, col.py], edge: col.edge });
+        continue;
+      }
+      const x = col.px + col.nx * col.depth * t;
+      const y = col.py + col.ny * col.depth * t;
+      band.push({ x, y, ...field(shape, x, y, true) });
     }
   }
+
+  // which grid points the band already covers; the grid fills the rest of the inside
+  const covered = new Uint8Array(n * n);
+  const cover = (p, q, r) => {
+    const minX = Math.max(0, Math.floor(Math.min(p.x, q.x, r.x) / step));
+    const maxX = Math.min(n - 1, Math.ceil(Math.max(p.x, q.x, r.x) / step));
+    const minY = Math.max(0, Math.floor(Math.min(p.y, q.y, r.y) / step));
+    const maxY = Math.min(n - 1, Math.ceil(Math.max(p.y, q.y, r.y) / step));
+    const cross = (a, b, x, y) => (b.x - a.x) * (y - a.y) - (b.y - a.y) * (x - a.x);
+    for (let j = minY; j <= maxY; j++) {
+      for (let i = minX; i <= maxX; i++) {
+        const x = i * step;
+        const y = j * step;
+        const c1 = cross(p, q, x, y);
+        const c2 = cross(q, r, x, y);
+        const c3 = cross(r, p, x, y);
+        if ((c1 >= 0 && c2 >= 0 && c3 >= 0) || (c1 <= 0 && c2 <= 0 && c3 <= 0)) covered[j * n + i] = 1;
+      }
+    }
+  };
+  for (let k = 0; k < rows; k++) {
+    for (let s = 0; s < count; s++) {
+      const a = band[k * count + s];
+      const b = band[k * count + ((s + 1) % count)];
+      const cc = band[(k + 1) * count + s];
+      const dd = band[(k + 1) * count + ((s + 1) % count)];
+      cover(a, b, cc);
+      cover(b, dd, cc);
+    }
+  }
+
   const pos = [];
   const nor = [];
   const col = [];
   const index = [];
-  const rim = [];
   const c = new THREE.Color();
-  for (const side of back ? [1, -back] : [1]) {
-    const map = new Int32Array(cells.length).fill(-1);
-    let count = pos.length / 3;
-    cells.forEach((cell, k) => {
-      if (!keep[k]) return;
-      const [px, py] = cell.d > 0 ? [cell.x, cell.y] : cell.near;
-      const h = pillow(cell.d, height, radius, dmax);
-      pos.push((px - 256) * UNIT, -(py - 256) * UNIT, base(px, py) + side * h * UNIT);
-      color(px, py, Math.max(cell.d, 0) / dmax, c);
-      col.push(c.r, c.g, c.b);
-      // the exact normal: steep at the rim, facing out along the path
-      const vx = cell.x - cell.near[0];
-      const vy = cell.y - cell.near[1];
+  const vertex = (p, side) => {
+    const h = pillow(p.d, height, radius, dmax);
+    pos.push((p.x - 256) * UNIT, -(p.y - 256) * UNIT, base(p.x, p.y) + side * h * UNIT);
+    color(p.x, p.y, Math.max(p.d, 0) / dmax, c);
+    col.push(c.r, c.g, c.b);
+    // the exact normal: steep at the rim, facing out along the path
+    let inward;
+    if (p.edge) inward = [-turn * p.edge[1], turn * p.edge[0]];
+    else {
+      const vx = p.x - p.near[0];
+      const vy = p.y - p.near[1];
       const len = Math.hypot(vx, vy) || 1;
-      const inward = cell.d > 0 ? [vx / len, vy / len] : [-vx / len, -vy / len];
-      const rise = (side > 0 ? 1 : back) * slope(cell.d, height, radius, dmax);
-      const gx = inward[0] * rise;
-      const gy = -inward[1] * rise;
-      const nl = Math.hypot(gx, gy, 1);
-      nor.push(-gx / nl, -gy / nl, (side > 0 ? 1 : -1) / nl);
-      rim.push(cell.d <= step * 0.75 ? 1 : 0);
-      map[k] = count++;
+      inward = [vx / len, vy / len];
+    }
+    const rise = (side > 0 ? 1 : back) * slope(p.d, height, radius, dmax);
+    const gx = inward[0] * rise;
+    const gy = -inward[1] * rise;
+    const nl = Math.hypot(gx, gy, 1);
+    nor.push(-gx / nl, -gy / nl, (side > 0 ? 1 : -1) / nl);
+    return pos.length / 3 - 1;
+  };
+
+  let frontCount = 0;
+  for (const side of back ? [1, -back] : [1]) {
+    const flip = (a, b, cc) => (side > 0 ? index.push(a, b, cc) : index.push(a, cc, b));
+    // the band, row by row around the outline
+    const bandStart = pos.length / 3;
+    for (const p of band) vertex(p, side);
+    for (let k = 0; k < rows; k++) {
+      for (let s = 0; s < count; s++) {
+        const a = bandStart + k * count + s;
+        const b = bandStart + k * count + ((s + 1) % count);
+        const cc = a + count;
+        const dd = b + count;
+        if (turn > 0) {
+          flip(a, cc, b);
+          flip(b, cc, dd);
+        } else {
+          flip(a, b, cc);
+          flip(b, dd, cc);
+        }
+      }
+    }
+    // the middle, and any gap the band leaves: grid squares wholly inside, with a corner the
+    // band does not cover. they overlap the band's inner edge, on the same surface.
+    const map = new Int32Array(cells.length).fill(-1);
+    cells.forEach((cell, k) => {
+      if (cell.d > 0) map[k] = vertex(cell, side);
     });
     for (let j = 0; j < grid; j++) {
       for (let i = 0; i < grid; i++) {
-        const a = map[j * n + i];
-        const b = map[j * n + i + 1];
-        const cc = map[(j + 1) * n + i];
-        const dd = map[(j + 1) * n + i + 1];
+        const k = [j * n + i, j * n + i + 1, (j + 1) * n + i, (j + 1) * n + i + 1];
+        const [a, b, cc, dd] = k.map((q) => map[q]);
         if (a < 0 || b < 0 || cc < 0 || dd < 0) continue;
-        if (at(i, j).d <= 0 && at(i + 1, j).d <= 0 && at(i, j + 1).d <= 0 && at(i + 1, j + 1).d <= 0) continue;
-        if (side > 0) index.push(a, cc, b, b, cc, dd);
-        else index.push(a, b, cc, b, dd, cc);
+        if (k.every((q) => covered[q])) continue;
+        flip(a, cc, b);
+        flip(b, cc, dd);
       }
     }
+    if (side > 0) frontCount = index.length;
   }
-  // relax the rim vertices along the outline, so the silhouette is smooth
-  const neighbours = new Map();
-  for (let k = 0; k < index.length; k += 3) {
-    const tri = [index[k], index[k + 1], index[k + 2]];
-    for (const a of tri) {
-      for (const b of tri) {
-        if (a === b || !rim[a] || !rim[b]) continue;
-        if (!neighbours.has(a)) neighbours.set(a, new Set());
-        neighbours.get(a).add(b);
-      }
-    }
-  }
-  for (let pass = 0; pass < 3; pass++) {
-    const next = pos.slice();
-    for (const [v, ns] of neighbours) {
-      let x = pos[v * 3];
-      let y = pos[v * 3 + 1];
-      for (const u of ns) {
-        x += pos[u * 3];
-        y += pos[u * 3 + 1];
-      }
-      next[v * 3] = x / (ns.size + 1);
-      next[v * 3 + 1] = y / (ns.size + 1);
-    }
-    for (let i = 0; i < pos.length; i++) pos[i] = next[i];
-  }
+
   const g = new THREE.BufferGeometry();
   g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3));
   g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
   g.setIndex(index);
-  return { geometry: g, shape, dmax };
+  // the front and the back meet at the rim; drawn as two groups so the back can sit a hair
+  // behind in depth, and never speckles through the front along the edge
+  g.addGroup(0, frontCount, 0);
+  if (index.length > frontCount) g.addGroup(frontCount, index.length - frontCount, 1);
+  return { geometry: g, shape, dmax, cells, n, step };
 }
 
-// glossy toy plastic that glows in its own vertex colours; "glow" can be changed live
-function glossy(THREE, glow) {
+// glossy toy plastic that glows in its own vertex colours; "glow" can be changed live. "behind"
+// pushes the surface back a little in depth, for the back of an inflated shape.
+function glossy(THREE, glow, behind = false) {
   const m = new THREE.MeshPhysicalMaterial({
     vertexColors: true,
     roughness: 0.12,
@@ -237,6 +380,9 @@ function glossy(THREE, glow) {
     emissive: "#ffffff",
     emissiveIntensity: glow,
     specularIntensity: 1,
+    polygonOffset: behind,
+    polygonOffsetFactor: behind ? 2 : 0,
+    polygonOffsetUnits: behind ? 2 : 0,
   });
   m.onBeforeCompile = (shader) => {
     shader.fragmentShader = shader.fragmentShader.replace(
@@ -270,19 +416,24 @@ export function buildFlame(THREE, { palette = "aurora", grid = 420 } = {}) {
   const paint = colours(THREE, PALETTES[palette]);
   const group = new THREE.Group();
   const outer = inflate(THREE, OUTER, { grid, height: OUTER_HEIGHT, radius: OUTER_RADIUS, color: paint.outer });
-  const outerMaterial = glossy(THREE, 0.32);
-  group.add(new THREE.Mesh(outer.geometry, outerMaterial));
+  const outerMaterials = [glossy(THREE, 0.32), glossy(THREE, 0.32, true)];
+  group.add(new THREE.Mesh(outer.geometry, outerMaterials));
   // the inner flame sits on the outer flame's surface and puffs up from it
-  const surface = (x, y) => pillow(field(outer.shape, x, y).d, OUTER_HEIGHT, OUTER_RADIUS, outer.dmax) * UNIT + 0.006;
+  const surface = (x, y) => {
+    const cell = outer.cells[Math.round(y / outer.step) * outer.n + Math.round(x / outer.step)];
+    return pillow(cell.d, OUTER_HEIGHT, OUTER_RADIUS, outer.dmax) * UNIT + 0.006;
+  };
   const inner = inflate(THREE, INNER, { grid, height: INNER_HEIGHT, radius: INNER_RADIUS, back: 0, base: surface, color: paint.inner });
-  const innerMaterial = glossy(THREE, 0.45);
-  group.add(new THREE.Mesh(inner.geometry, innerMaterial));
+  const innerMaterials = [glossy(THREE, 0.45)];
+  group.add(new THREE.Mesh(inner.geometry, innerMaterials));
   // lift the flame so its mass sits in the middle of the frame, not its bounds: the tips are thin
   group.position.y = 0.2;
   const pose = new THREE.Group();
   pose.add(group);
   pose.rotation.set(0.12, -0.32, 0);
-  pose.userData.materials = [outerMaterial, innerMaterial];
+  // the website changes the glow live: the outer flame's materials, then the inner flame's
+  pose.userData.outer = outerMaterials;
+  pose.userData.inner = innerMaterials;
   return pose;
 }
 
