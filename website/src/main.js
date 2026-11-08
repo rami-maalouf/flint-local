@@ -30,6 +30,8 @@ const DAYS = 14;
 const MISSED = 8;
 const days = Array.from({ length: DAYS }, () => false);
 const listeners = new Set();
+// who hears a single day change: the live flame, which sends that day's ember into the fire
+const dayListeners = new Set();
 const strip = document.getElementById("days");
 const caption = document.getElementById("caption");
 const letters = new Intl.DateTimeFormat("en", { weekday: "narrow" });
@@ -48,6 +50,7 @@ const buttons = days.map((_, i) => {
     stopTour();
     days[i] = !days[i];
     update();
+    for (const listen of dayListeners) listen(i, days[i]);
   });
   strip.append(b);
   return b;
@@ -106,6 +109,7 @@ function play(i = 0) {
   if (i >= DAYS) return update();
   days[i] = i !== MISSED;
   update();
+  if (days[i]) for (const listen of dayListeners) listen(i, true);
   tour = setTimeout(() => play(i + 1), i === MISSED ? 700 : 260);
 }
 
@@ -130,9 +134,23 @@ if (webgl) {
   const start = () =>
     import("./scene.js")
       .then(({ mountFlame }) => {
-        const flame = mountFlame(canvas, { reduced, level: flameLevel(days) });
-        listeners.add(flame.setLevel);
-        document.querySelector(".flame-slot").classList.add("live");
+        const slot = document.querySelector(".flame-slot");
+        const flame = mountFlame(canvas, { reduced, level: flameLevel(days), slot });
+        if (reduced) listeners.add(flame.setLevel);
+        else {
+          // a checked day's ember flies from its dot into the flame, which grows when it lands;
+          // an undone day sends up smoke
+          dayListeners.add((i, on) => {
+            if (!on) return flame.douse(flameLevel(days));
+            const r = buttons[i].querySelector(".pip").getBoundingClientRect();
+            flame.feed(r.left + r.width / 2, r.top + r.height / 2, () => flame.land(flameLevel(days)));
+          });
+          const hint = document.createElement("p");
+          hint.className = "flame-hint";
+          hint.textContent = "Tap a day, or press and hold the flame.";
+          caption.after(hint);
+        }
+        slot.classList.add("live");
       })
       .catch(() => undefined);
   if ("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 1200 });

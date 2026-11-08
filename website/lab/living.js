@@ -76,14 +76,14 @@ export function mountLivingFlame(canvas, { reduced = false, level: initial = 0.9
   // a warm pool of light under the flame, so it stands somewhere
   const glow = glowTexture();
   const pool = new THREE.Mesh(
-    new THREE.PlaneGeometry(5.2, 2.2),
+    new THREE.PlaneGeometry(3.2, 1.3),
     new THREE.MeshBasicMaterial({ map: glow, color: "#2fd1c7", transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false }),
   );
   pool.rotation.x = -Math.PI / 2.25;
   pool.position.set(0, -1.32, 0.1);
   scene.add(pool);
   const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color: "#3b82ff", transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending, depthWrite: false }));
-  halo.scale.set(4.4, 4.8, 1);
+  halo.scale.set(2.9, 3.2, 1);
   halo.position.set(0, 0.1, -0.8);
   scene.add(halo);
 

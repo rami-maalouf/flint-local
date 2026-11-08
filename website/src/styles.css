@@ -302,6 +302,26 @@ h1 {
 .live .still {
   opacity: 0;
 }
+/* the live flame can be held: a press stokes it. vertical scrolling still passes through */
+.flame-slot.live {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.flame-slot.live:active {
+  cursor: grabbing;
+}
+.flame-hint {
+  margin: 0.35rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: center;
+}
 
 .days {
   display: grid;
