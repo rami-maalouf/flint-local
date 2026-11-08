@@ -27,7 +27,7 @@ Bun's dev server can't resolve the fonts' absolute paths, so preview the built s
 
 ## The waitlist
 
-The hero and the close each hold the same form: pick iPhone, Android or both, and leave an email. `api/waitlist.ts` writes it to the shared Orbit Labs waitlist in Notion (the "Twilight waitlist" data source, also used by Twilight, Ignite, Serendipity and Eloq) with `App` set to `flint` and `Platform` set to `iOS`, `Android` or both. A second signup with the same email adds any new platform to the existing Flint row instead of adding a row. A hidden field catches simple bots.
+The hero and the close each hold the same form: pick a mobile platform (iPhone or Android), a desktop platform (Mac, Windows or Linux), or one of each, and leave an email. One platform always stays picked. `api/waitlist.ts` writes it to the shared Orbit Labs waitlist in Notion (the "Twilight waitlist" data source, also used by Twilight, Ignite, Serendipity and Eloq) with `App` set to `flint` and `Platform` set to the picks (`iOS`, `Android`, `macOS`, `Windows`, `Linux`). The function refuses two picks from one group. A second signup with the same email adds any new platform to the existing Flint row instead of adding a row. A hidden field catches simple bots.
 
 The Vercel project `flint` needs two production variables: `NOTION_API_KEY` (the integration with access to that data source) and `NOTION_WAITLIST_DATASOURCE_ID`. The function calls the Notion API with `fetch`, so the static deploy needs no packages.
 

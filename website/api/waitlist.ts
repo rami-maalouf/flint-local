@@ -1,7 +1,7 @@
 // the waitlist: adds an email to the shared orbit labs notion waitlist, tagged app "flint" and
-// the platforms the person picked. one row per email for flint: a second signup with the same
-// email adds any new platform to that row instead of making a duplicate. other apps' rows for
-// the same email are left alone.
+// the platforms the person picked: at most one mobile and one desktop platform, at least one in
+// all. one row per email for flint: a second signup with the same email adds any new platform to
+// that row instead of making a duplicate. other apps' rows for the same email are left alone.
 // needs NOTION_API_KEY and NOTION_WAITLIST_DATASOURCE_ID in the vercel project.
 
 // vercel's edge runtime provides process.env; declared here so the function needs no node types
@@ -10,8 +10,9 @@ declare const process: { env: Record<string, string | undefined> };
 export const config = { runtime: "edge" };
 
 const APP = "flint";
-const PLATFORMS = ["iOS", "Android"] as const;
-type Platform = (typeof PLATFORMS)[number];
+// the names match the notion "Platform" options
+const MOBILE = ["iOS", "Android"];
+const DESKTOP = ["macOS", "Windows", "Linux"];
 
 const NOTION = "https://api.notion.com/v1";
 const NOTION_VERSION = "2025-09-03";
@@ -23,9 +24,12 @@ function reply(status: number, body: Record<string, unknown>) {
   });
 }
 
-function readPlatforms(value: unknown): Platform[] {
-  if (!Array.isArray(value)) return [];
-  return PLATFORMS.filter((p) => value.includes(p));
+function readPlatforms(value: unknown): string[] | null {
+  if (!Array.isArray(value)) return null;
+  const mobile = MOBILE.filter((p) => value.includes(p));
+  const desktop = DESKTOP.filter((p) => value.includes(p));
+  if (mobile.length > 1 || desktop.length > 1) return null;
+  return [...mobile, ...desktop];
 }
 
 export default async function handler(request: Request) {
@@ -46,7 +50,9 @@ export default async function handler(request: Request) {
     return reply(400, { error: "Use a valid email address." });
   }
   const platforms = readPlatforms(body.platforms);
-  if (platforms.length === 0) return reply(400, { error: "Pick iPhone, Android, or both." });
+  if (!platforms || platforms.length === 0) {
+    return reply(400, { error: "Pick a mobile platform, a desktop platform, or one of each." });
+  }
 
   const key = process.env.NOTION_API_KEY;
   const dataSource = process.env.NOTION_WAITLIST_DATASOURCE_ID;

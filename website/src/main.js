@@ -6,7 +6,9 @@ const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 requestAnimationFrame(() => document.body.classList.add("ready"));
 
 // the waitlist forms, in the hero and the close: each one posts to /api/waitlist, which adds the
-// email to the notion waitlist with the phones picked
+// email to the notion waitlist with the platforms picked. each group (mobile, desktop) takes one
+// pick, and one platform always stays picked.
+const PLATFORM_NAMES = { iOS: "iPhone", macOS: "Mac" };
 for (const form of document.querySelectorAll("[data-waitlist]")) {
   const note = form.querySelector(".form-note");
   const button = form.querySelector('button[type="submit"]');
@@ -22,6 +24,21 @@ for (const form of document.querySelectorAll("[data-waitlist]")) {
     if (form.dataset.state === "error") say("idle", intro);
   });
 
+  const chips = [...form.querySelectorAll('input[name="platforms"]')];
+  for (const chip of chips) {
+    chip.addEventListener("change", () => {
+      if (chip.checked) {
+        // a new pick replaces the other one in its group
+        for (const other of chip.closest(".group").querySelectorAll('input[name="platforms"]')) {
+          if (other !== chip) other.checked = false;
+        }
+      } else if (!chips.some((c) => c.checked)) {
+        // the last pick stays: there is always one platform to tell you about
+        chip.checked = true;
+      }
+    });
+  }
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (form.dataset.state === "sending") return;
@@ -33,7 +50,7 @@ for (const form of document.querySelectorAll("[data-waitlist]")) {
       return;
     }
     if (platforms.length === 0) {
-      say("error", "Pick iPhone, Android, or both.");
+      say("error", "Pick a mobile platform, a desktop platform, or one of each.");
       return;
     }
 
@@ -48,12 +65,12 @@ for (const form of document.querySelectorAll("[data-waitlist]")) {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "We could not save that. Try again in a minute.");
-      const phones = platforms.map((p) => (p === "iOS" ? "iPhone" : p)).join(" and ");
+      const names = platforms.map((p) => PLATFORM_NAMES[p] ?? p).join(" and ");
       say(
         "done",
         data.alreadyAdded && !data.added?.length
           ? "You are already on the list."
-          : `You are on the list. We will email you when Flint is ready for ${phones}.`,
+          : `You are on the list. We will email you when Flint is ready for ${names}.`,
       );
       button.textContent = "On the list";
       for (const input of form.querySelectorAll("input")) input.disabled = true;

@@ -222,25 +222,33 @@ button.button {
   max-width: 31rem;
   margin-top: 2.1rem;
 }
+/* two rows, mobile and desktop: one pick in each, at least one in all */
 .platforms {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0 0 0.85rem;
+  display: grid;
+  gap: 0.55rem;
+  margin: 0 0 0.95rem;
+}
+.group {
+  margin: 0;
   padding: 0;
   border: 0;
   min-inline-size: 0;
 }
-.platforms legend {
+.group legend {
   float: left;
-  margin-right: 0.5rem;
+  width: 5.4rem;
   padding: 0;
+  line-height: 2.3rem;
   font-family: var(--mono);
   font-size: 0.74rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ink-faint);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 .chip {
   position: relative;
@@ -630,6 +638,16 @@ h2 {
   margin: 2.2rem auto 0;
 }
 .close .platforms {
+  justify-items: center;
+  gap: 0.9rem;
+}
+.close .group legend {
+  float: none;
+  width: auto;
+  margin: 0 auto 0.4rem;
+  line-height: 1.4;
+}
+.close .chips {
   justify-content: center;
 }
 .close .form-note {
@@ -759,6 +777,16 @@ h2 {
 @media (max-width: 520px) {
   .bar nav a:not(.pill) {
     display: none;
+  }
+  /* the legend goes above its chips, so the three desktop chips keep one line */
+  .group legend {
+    float: none;
+    width: auto;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+  }
+  .platforms {
+    gap: 0.8rem;
   }
   .button {
     padding: 0 1.05rem;
