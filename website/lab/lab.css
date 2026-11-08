@@ -1,0 +1,40 @@
+/* the lab: the real hero, a switch between experiments, and a line on how to play */
+.lab-nav {
+  gap: 0.35rem !important;
+  padding: 0.3rem;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  background: rgb(255 255 255 / 0.04);
+}
+.lab-nav a {
+  padding: 0.38rem 0.85rem;
+  border-radius: 999px;
+}
+.lab-nav a[aria-current="page"] {
+  background: var(--ink);
+  color: var(--night-deep);
+}
+.lab-hint {
+  margin: 2rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--turquoise);
+}
+.flame-slot {
+  touch-action: none;
+  cursor: grab;
+}
+.flame-slot:active {
+  cursor: grabbing;
+}
+.bar .lab-nav a {
+  display: inline-block !important;
+}
+@media (max-width: 520px) {
+  .lab-nav a {
+    padding: 0.32rem 0.55rem;
+    font-size: 0.8rem;
+  }
+}
