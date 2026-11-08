@@ -14,6 +14,7 @@ It is plain HTML, CSS and one module, bundled by [Bun](https://bun.sh) into stat
 | `src/img/` | The icon cuts, the mark, the still and the share image, all rendered by `../brand` (`bun run render`). |
 | `src/public/fonts/` | Sora, Geist and Geist Mono (SIL OFL). |
 | `build.ts` | Bundles the pages into `dist/` and adds the fixed-address files. |
+| `api/waitlist.ts` | The waitlist form's endpoint, `POST /api/waitlist`: a Vercel edge function, copied into `dist/api/` by the build. |
 
 ```sh
 bun install
@@ -24,4 +25,12 @@ bun run build      # dist/, ready for any static host
 
 Bun's dev server can't resolve the fonts' absolute paths, so preview the built site.
 
-Keep each claim true to the app: `README.md` and the product specs are the source. When the App Store listing is live, replace "Coming soon to the App Store" with the store link in the hero and the close.
+## The waitlist
+
+The hero and the close each hold the same form: pick iPhone, Android or both, and leave an email. `api/waitlist.ts` writes it to the shared Orbit Labs waitlist in Notion (the "Twilight waitlist" data source, also used by Twilight, Ignite, Serendipity and Eloq) with `App` set to `flint` and `Platform` set to `iOS`, `Android` or both. A second signup with the same email adds any new platform to the existing Flint row instead of adding a row. A hidden field catches simple bots.
+
+The Vercel project `flint` needs two production variables: `NOTION_API_KEY` (the integration with access to that data source) and `NOTION_WAITLIST_DATASOURCE_ID`. The function calls the Notion API with `fetch`, so the static deploy needs no packages.
+
+## Claims
+
+The site describes Flint as it ships to TestFlight from `rami-maalouf/flint` (bundle `studio.orbitlabs.habitsystem.fullstack`): an optional account with sync to Flint's server, and AI assistants through MCP at `habits.ramimaalouf.com/mcp`. Keep each claim true to that app. The App Store listing, the TestFlight beta information and the app's Settings link to `/privacy` here; change it with care. When the App Store listing is live, add the store link next to the waitlist.

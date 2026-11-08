@@ -1,5 +1,6 @@
 // builds the site into dist/: bun bundles the pages, their css and script (hashed names),
-// splits the 3d flame into its own file, and we add what lives at fixed addresses.
+// splits the 3d flame into its own file, and we add what lives at fixed addresses and the
+// waitlist function.
 import { cp, rm } from "node:fs/promises";
 
 await rm("dist", { recursive: true, force: true });
@@ -19,6 +20,8 @@ if (!result.success) {
 await cp("./src/public", "./dist", { recursive: true });
 await cp("./src/img/share.jpg", "./dist/share.jpg");
 await cp("./src/vercel.json", "./dist/vercel.json");
+// the waitlist function: vercel runs dist/api/*.ts as functions next to the static pages
+await cp("./api", "./dist/api", { recursive: true });
 
 // preload the two text faces, which bun would otherwise try to bundle from the html
 const preload = ["sora-latin-wght-normal", "geist-latin-wght-normal"]

@@ -186,12 +186,6 @@ h1 {
   color: var(--ink-soft);
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 2.1rem;
-}
 .button {
   display: inline-flex;
   align-items: center;
@@ -211,26 +205,149 @@ h1 {
   color: var(--night-deep);
   box-shadow: 0 0 0 1px rgb(255 255 255 / 0.4) inset, 0 10px 40px -10px rgb(34 211 197 / 0.55);
 }
-.button.glass {
-  background: rgb(255 255 255 / 0.06);
-  border: 1px solid rgb(255 255 255 / 0.12);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: var(--ink);
-}
 .glyph {
   width: 1.1rem;
   height: 1.1rem;
   fill: currentColor;
 }
-.arrow {
-  width: 0.9rem;
-  height: 0.9rem;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+
+/* the waitlist: pick your phone, leave an email. one glass pill, the button inside it */
+button.button {
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+.waitlist {
+  width: 100%;
+  max-width: 31rem;
+  margin-top: 2.1rem;
+}
+.platforms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.85rem;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+.platforms legend {
+  float: left;
+  margin-right: 0.5rem;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.chip {
+  position: relative;
+  cursor: pointer;
+}
+.chip input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.chip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 2.3rem;
+  padding: 0 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.03);
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: color 0.2s var(--ease), background 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.chip .glyph {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+.chip:hover span {
+  color: var(--ink-soft);
+}
+.chip input:checked + span {
+  color: var(--ink);
+  background: rgb(255 255 255 / 0.1);
+  border-color: rgb(34 211 197 / 0.55);
+}
+.chip input:focus-visible + span {
+  outline: 2px solid var(--turquoise);
+  outline-offset: 2px;
+}
+.field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.3rem 0.3rem 1.25rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(255 255 255 / 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.field:focus-within {
+  border-color: rgb(255 255 255 / 0.32);
+  box-shadow: 0 0 0 4px rgb(34 211 197 / 0.12);
+}
+.field input {
+  flex: 1;
+  min-width: 0;
+  height: 2.6rem;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+}
+.field input::placeholder {
+  color: var(--ink-faint);
+}
+.field .button {
+  flex-shrink: 0;
+  height: 2.6rem;
+}
+.field .button:disabled {
+  cursor: default;
+  transform: none;
+  opacity: 0.75;
+}
+.form-note {
+  margin: 0.8rem 0 0 1.25rem;
+  min-height: 1.4em;
+  font-size: 0.88rem;
+  color: var(--ink-faint);
+}
+.waitlist[data-state="error"] .form-note {
+  color: #ff9a8a;
+}
+.waitlist[data-state="done"] .form-note {
+  color: var(--lime);
+}
+.waitlist[data-state="done"] .field {
+  border-color: rgb(182 239 74 / 0.4);
+}
+.waitlist[data-state="done"] .field .button:disabled {
+  opacity: 1;
+}
+/* a field for bots only */
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 
 .specs {
@@ -509,8 +626,15 @@ h2 {
 .close h2 {
   margin-top: 2rem;
 }
-.close .actions {
+.close .waitlist {
+  margin: 2.2rem auto 0;
+}
+.close .platforms {
   justify-content: center;
+}
+.close .form-note {
+  margin-left: 0;
+  text-align: center;
 }
 .note {
   display: flex;
@@ -566,6 +690,15 @@ h2 {
   text-decoration: underline;
   text-decoration-color: rgb(255 255 255 / 0.3);
   text-underline-offset: 0.2em;
+}
+.page code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  padding: 0.1em 0.4em;
+  border-radius: 0.4em;
+  background: rgb(255 255 255 / 0.07);
+  color: var(--ink);
+  overflow-wrap: anywhere;
 }
 .page .updated {
   font-family: var(--mono);
@@ -627,15 +760,33 @@ h2 {
   .bar nav a:not(.pill) {
     display: none;
   }
-  .actions {
-    gap: 0.6rem;
-  }
   .button {
     padding: 0 1.05rem;
     font-size: 0.94rem;
   }
   .day {
     font-size: 0.56rem;
+  }
+  .field {
+    padding-left: 1rem;
+  }
+  .form-note {
+    margin-left: 1rem;
+  }
+}
+@media (max-width: 380px) {
+  /* too narrow for the button inside the pill: stack them */
+  .field {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.3rem;
+    border-radius: 1.6rem;
+  }
+  .field input {
+    padding: 0 0.9rem;
+  }
+  .field .button {
+    justify-content: center;
   }
 }
 

@@ -5,6 +5,66 @@ const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 requestAnimationFrame(() => document.body.classList.add("ready"));
 
+// the waitlist forms, in the hero and the close: each one posts to /api/waitlist, which adds the
+// email to the notion waitlist with the phones picked
+for (const form of document.querySelectorAll("[data-waitlist]")) {
+  const note = form.querySelector(".form-note");
+  const button = form.querySelector('button[type="submit"]');
+  const email = form.elements.email;
+  const intro = note.textContent;
+  const label = button.textContent;
+  const say = (state, text) => {
+    form.dataset.state = state;
+    note.textContent = text;
+  };
+
+  form.addEventListener("input", () => {
+    if (form.dataset.state === "error") say("idle", intro);
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (form.dataset.state === "sending") return;
+    const platforms = [...form.querySelectorAll('input[name="platforms"]:checked')].map((i) => i.value);
+    const address = email.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) {
+      say("error", "Use a valid email address.");
+      email.focus();
+      return;
+    }
+    if (platforms.length === 0) {
+      say("error", "Pick iPhone, Android, or both.");
+      return;
+    }
+
+    say("sending", "Adding you to the list…");
+    button.disabled = true;
+    button.textContent = "Joining…";
+    try {
+      const response = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: address, platforms, company: form.elements.company.value }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "We could not save that. Try again in a minute.");
+      const phones = platforms.map((p) => (p === "iOS" ? "iPhone" : p)).join(" and ");
+      say(
+        "done",
+        data.alreadyAdded && !data.added?.length
+          ? "You are already on the list."
+          : `You are on the list. We will email you when Flint is ready for ${phones}.`,
+      );
+      button.textContent = "On the list";
+      for (const input of form.querySelectorAll("input")) input.disabled = true;
+    } catch (error) {
+      say("error", error instanceof Error && error.message !== "Failed to fetch" ? error.message : "No connection. Try again.");
+      button.disabled = false;
+      button.textContent = label;
+    }
+  });
+}
+
 // the bar frosts once the page has scrolled
 const bar = document.querySelector(".bar");
 const frost = () => bar.classList.toggle("scrolled", scrollY > 8);
