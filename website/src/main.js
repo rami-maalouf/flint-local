@@ -80,10 +80,13 @@ function describe(checks) {
   return `${kept} of ${DAYS} days kept. The flame is lit.`;
 }
 
+let touring = false;
 function update() {
   buttons.forEach((b, i) => b.setAttribute("aria-pressed", String(days[i])));
   const level = flameLevel(days);
-  caption.textContent = describe(days);
+  // while the opening plays, the unlit days ahead are not misses yet
+  const kept = days.filter(Boolean).length;
+  caption.textContent = touring ? `${kept} ${kept === 1 ? "day" : "days"} kept.` : describe(days);
   document.querySelector(".flame-slot").style.setProperty("--glow", String(0.25 + level * 0.75));
   for (const listen of listeners) listen(level);
 }
@@ -93,9 +96,14 @@ let tour = null;
 function stopTour() {
   clearTimeout(tour);
   tour = null;
+  if (touring) {
+    touring = false;
+    update();
+  }
 }
 function play(i = 0) {
-  if (i >= DAYS) return;
+  touring = i < DAYS;
+  if (i >= DAYS) return update();
   days[i] = i !== MISSED;
   update();
   tour = setTimeout(() => play(i + 1), i === MISSED ? 700 : 260);
