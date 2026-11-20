@@ -82,3 +82,16 @@ The store flows (`.argent/flows/store-*.yaml`, seed in `goldie/seed/`) ran again
 ## Not verified on this Mac
 
 The donation price was not seen in a simulator. iOS 26.5 returns no product from the StoreKit test configuration when it is run from the command line, and the Release build stops at launch on iOS 27. Run a sandbox donation on a TestFlight build after the in-app purchase and the Paid Apps Agreement are active.
+
+## In-app purchase review screenshot
+
+`life-os/design/app-store/flint/final/review/support-flint-review-1206x2622.png` (1206 x 2622, RGB, no alpha, light mode) is a real capture of Settings > Support Flint with "Donate $1.99", made on November 20, 2026. StoreKit loaded the price from the test product in `modules/tip-jar/ios/Tests/Support.storekit`. Recipe:
+
+1. Build the Release simulator app (see `goldie/goldie.config.ts`) and copy it into the build products of a hosted unit-test project whose only test opens an `SKTestSession` with `Support.storekit` and then sleeps.
+2. Embed that test bundle in the copy's `PlugIns`, and point the `.xctestrun` test host at the copy (`studio.orbitlabs.habitsystem`), so the session lives in Flint's own process. A session in a separate test app does not reach Flint.
+3. Run `xcodebuild test-without-building` on an iPhone 17 Pro with iOS 27.0, then open Settings > Support Flint and capture with the status bar pinned to 9:41. iOS 26.5 returns no product from a command-line StoreKit configuration.
+4. On iOS 27, mark the copy's executable as built with the iOS 26.5 SDK (`vtool -set-build-version iossim 18.6 26.5 -replace`) and re-sign it ad hoc with the App Group. The reason is below.
+
+## iOS 27 SDK launch crash
+
+A build linked against the iOS 27 SDK (Xcode 27) stops at launch on iOS 27. UIKit traps in `_UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption` because the app does not adopt the UIScene lifecycle (crash report of November 20, 2026, iOS 27.0 simulator). The same binary marked as built with the iOS 26.5 SDK launches normally. The `production` profile in `eas.json` names no build image, so EAS chooses the Xcode version. Before the store build, confirm that the image builds with the iOS 26 SDK (Xcode 26), or adopt the scene lifecycle first. Otherwise the app can crash at launch for every person on iOS 27.
