@@ -3948,3 +3948,11 @@ Evidence: `bun run validate` exits 0 (3109 tests, coverage gates met) before the
 Habit progress counts each completed logical day once and carries the count across isolated misses. The current day stays open until the habit's day boundary. The alternating four-day example, consecutive completions, and the reset boundary have regression coverage in the analytics suite.
 
 Home cards now retain the flame for a regular streak and display the half-streak count independently in each layout. The Home route regression reproduced the missing flame on the previous phone build.
+
+## Release 1.0 preparation - 2026-11-20
+
+Branch `release/1.0` prepares version 1.0.0 for the App Store as "Flint: habit tracker". It merges `feat/flame-brand` (the aurora flame icon, the icon choices, the launch flame and the website), ports the full-stack Flint commits `b62935f`, `721180b` (without its `services/mcp` part) and `26079fe` (half streaks on Home and in habit progress), makes the app iPhone only, aligns the widget extension's device family with the app, and adds an optional one-time StoreKit donation in Settings > Support Flint Local, ported from OpenMulticam's tip jar (`modules/tip-jar`, product `studio.orbitlabs.habitsystem.tip.developer.support`). No identity, migration, sync record or backup format changed. The release plan and the open items are in `docs/release-1.0.md`.
+
+iCloud sync: on 2026-11-20 the owner reported "owner verified on physical devices" and chose to ship sync in 1.0, off by default. This entry records that report only. The repository holds no device evidence for it, so T19's formal two-target acceptance and Checkpoint C are not closed by it.
+
+Evidence: `bun run validate` exits 0 with 215 suites and 3,132 tests, every `src/core` file at 100 percent on all four metrics. `bun run test:native` exits 0 (16 plugin tests, 55 Swift XCTest cases). The hosted StoreKit tests (`bun run test:storekit`) pass purchase/restore and refund on an iOS 27.0 simulator; the failed-purchase test hangs and the ask-to-buy test times out there. OpenMulticam's unchanged suite fails the same way on the same simulator, and no iOS 26.1 runtime, where OpenMulticam's tests pass, is installed on this Mac.
