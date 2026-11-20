@@ -74,3 +74,11 @@ bun run validate        # lint, typecheck, jest with coverage
 bun run test:native     # plugin config and swift package tests
 bun run test:storekit   # hosted storekit tests; needs xcodegen and an iOS 26.1 or 27 iPhone simulator
 ```
+
+## Store screenshots
+
+The store flows (`.argent/flows/store-*.yaml`, seed in `goldie/seed/`) ran against a Release simulator build of this branch on November 20, 2026. Their raw captures match the full-stack raws behind the final store set: three are byte-identical, and two differ only by one colour step in the status bar. The final screenshots in `life-os/design/app-store/flint/final/` stay valid for Flint Local. The new raws are in `passes/flint-local-raw/` there.
+
+## Not verified on this Mac
+
+The donation price was not seen in a simulator. iOS 26.5 returns no product from the StoreKit test configuration when it is run from the command line, and the Release build stops at launch on iOS 27. Run a sandbox donation on a TestFlight build after the in-app purchase and the Paid Apps Agreement are active.
