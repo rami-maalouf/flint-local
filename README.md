@@ -4,7 +4,7 @@ A private, local-first habit tracker for iOS, built with Expo and React Native. 
 
 This is a full-history fork of [Ripples](https://github.com/rami-maalouf/habit-tracker). [FORK.md](FORK.md) records the origin and the separate Flint Local app, App Group, and CloudKit identities.
 
-The app's design direction is monochrome: black, white, and system Liquid Glass, with no fixed accent-color theme.
+The app's design direction is monochrome: black, white, and system Liquid Glass, with no fixed accent-color theme. The mark is a glossy flame, rendered from one script in `brand/`; [docs/brand.md](docs/brand.md) has the palettes and assets. The website for flint.orbitlabs.studio is in [website/](website/README.md).
 
 For the full-stack app with Snapback account sync, see [Flint](https://github.com/rami-maalouf/flint). Both apps keep their existing installed identities and backup format so the rename preserves existing data.
 

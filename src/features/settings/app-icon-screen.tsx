@@ -122,23 +122,34 @@ function AppIconBody() {
               onPress={() => { void choose(icon.id); }}
               style={{ alignItems: 'center', gap: spacing.sm }}
             >
-              <Image
-                accessible
-                accessibilityLabel={`${icon.name} icon preview`}
-                accessibilityRole="image"
-                source={icon.source}
-                contentFit="cover"
+              {/* the chosen icon wears a ring; every tile keeps the ring's space, so all line up.
+                  the tile's accessibility state already says which one is selected */}
+              <View
+                testID={`icon-ring-${icon.name.toLowerCase()}`}
                 style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: radius.lg,
-                  borderWidth: 1,
-                  borderColor: semanticColor('separator', scheme),
+                  padding: 3,
+                  borderRadius: radius.lg + 5,
+                  borderWidth: 2,
+                  borderColor: selected === icon.id ? semanticColor('label', scheme) : 'transparent',
                 }}
-                testID={`icon-preview-${icon.name.toLowerCase()}`}
-              />
+              >
+                <Image
+                  accessible
+                  accessibilityLabel={`${icon.name} icon preview`}
+                  accessibilityRole="image"
+                  source={icon.source}
+                  contentFit="cover"
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: radius.lg,
+                    borderWidth: 1,
+                    borderColor: semanticColor('separator', scheme),
+                  }}
+                  testID={`icon-preview-${icon.name.toLowerCase()}`}
+                />
+              </View>
               <AppText variant="footnote">{icon.name}</AppText>
-              {selected === icon.id ? <AppText variant="footnote">Selected</AppText> : null}
             </ProductPressable>
           ))}
         </View>

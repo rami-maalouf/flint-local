@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Flint: flame lab</title>
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="stylesheet" href="../src/styles.css" />
+    <link rel="stylesheet" href="./lab.css" />
+  </head>
+  <body class="ready">
+    <header class="bar">
+      <a class="brand" href="./">
+        <img src="../src/img/mark.png" alt="" width="26" height="26" />
+        <span>Flint lab</span>
+      </a>
+      <nav class="lab-nav" aria-label="Experiments">
+        <a href="?x=feed" data-x="feed">Feed</a>
+        <a href="?x=strike" data-x="strike">Strike</a>
+        <a href="?x=wind" data-x="wind">Wind</a>
+        <a href="?x=all" data-x="all">All</a>
+      </nav>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <h1 id="hero-title">Keep the <span class="nowrap">flame lit<img class="full-stop" src="../src/img/mark.png" alt="" width="64" height="64" /></span></h1>
+          <p class="lead">Flint is a private habit tracker for iPhone. Check in each day, link habits into stacks, and earn the rewards you set yourself.</p>
+          <p class="lab-hint" id="hint"></p>
+        </div>
+        <div class="stage">
+          <div class="flame-slot live" id="slot">
+            <canvas id="flame" aria-hidden="true"></canvas>
+          </div>
+          <div class="days" role="group" aria-label="The last fourteen days" id="days"></div>
+          <p class="caption" id="caption" aria-live="polite"></p>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="./lab.js"></script>
+  </body>
+</html>
