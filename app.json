@@ -8,18 +8,18 @@
     "scheme": "habitsystem",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "deploymentTarget": "18.6",
       "bundleIdentifier": "studio.orbitlabs.habitsystem",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "CFBundleDisplayName": "Flint Local"
+        "CFBundleDisplayName": "Flint"
       },
       "appleTeamId": "3V2UU7RRK9"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#0D1730",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -37,8 +37,13 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
+          "imageWidth": 180,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "image": "./assets/images/splash-icon.png",
+            "backgroundColor": "#000000"
+          }
         }
       ],
       "expo-image",
@@ -52,7 +57,7 @@
           "widgets": [
             {
               "name": "HabitSystemBoards",
-              "displayName": "Flint Local",
+              "displayName": "Flint",
               "description": "Your boards with seven-day strips and quick check-in.",
               "supportedFamilies": [
                 "systemSmall",

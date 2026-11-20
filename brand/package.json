@@ -1,0 +1,11 @@
+{
+  "name": "flint-brand",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "bun render.mjs"
+  },
+  "dependencies": {
+    "three": "0.187.0"
+  }
+}

@@ -11,6 +11,7 @@ import type { BoardId, CheckInId, CommandId } from '@/core/domain/ids';
 import type { HomeBoardCard } from '@/core/domain/queries';
 import { getDailyToggleSnapshot, getHomeBoardProjection } from '@/core/domain/queries';
 import { triggerActionHaptic } from '@/foundation/haptics';
+import { revealApp } from '@/platform/launch-screen';
 import { semanticColor, semanticFallbacks, spacing } from '@/theme';
 
 import { BoardCard } from './board-card';
@@ -51,6 +52,8 @@ export function BoardsHomeScreen() {
   );
 
   const boards = useProductQuery((c) => getHomeBoardProjection(c), []);
+  // the launch flame fades once home has something real to show: habits, an empty state or an error
+  useEffect(() => { if (boards.status !== 'loading') revealApp(); }, [boards.status]);
   const [editMode, setEditMode] = useState(false);
   const [layoutMode, setLayoutMode] = useState(false);
   const layoutPreference = useBoardLayout();

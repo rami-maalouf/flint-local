@@ -40,6 +40,12 @@ never evaluates iOS code:
 
 Every stub carries a `readiness` field naming its planned implementation.
 
+The optional tip jar (`modules/tip-jar`, StoreKit 2) is iOS only. Its module
+config lists only the `apple` platform, so Android autolinking leaves it out,
+and `src/platform/tip-jar/index.ts` reports it unsupported, which hides the
+Settings row. A Google Play Billing port exists in OpenMulticam's
+`modules/tip-jar/android` if Android ever ships.
+
 ## The shared fixture suite
 
 `src/core/automations/fixtures/intent-contract.json` is the single source of

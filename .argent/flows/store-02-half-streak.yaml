@@ -1,0 +1,9 @@
+steps:
+  - echo: Replace the database with fifteen months of store data that ends today. goldie reinstalls the app once per capture, and the app group container that holds the database survives that reinstall.
+  - script: { path: ../../goldie/seed/install-store-data.mjs, timeout: 120000 }
+  - launch: studio.orbitlabs.habitsystem
+  - await: { visible: { text: Drink water }, timeout: 15000 }
+  - echo: Read a page missed single days, so its plain streak is short and its half streak is long.
+  - tap: { text: Read a page }
+  - await: { visible: { id: open-journal } }
+  - await: { idle: true }

@@ -1,0 +1,4 @@
+# goldie store assets, rebuilt by goldie capture and frame, and the seeded database.
+# kept here instead of the root .gitignore, whose hash is part of the ios fingerprint.
+out/
+seed/out/

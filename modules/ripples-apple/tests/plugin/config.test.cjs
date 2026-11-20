@@ -136,6 +136,25 @@ test('dev launcher ordering is finalized after a later widget xcode mod appends 
   });
 });
 
+test('embedded extensions follow the application device family, so an iphone-only app embeds an iphone-only widget', async () => {
+  await withTemplateProject(async (project) => {
+    const application = project.getFirstTarget();
+    const widget = project.addTarget('Widget', 'app_extension', 'Widget', 'studio.orbitlabs.habitsystem.Widget');
+    const settingsOf = (target) => Object.entries(project.pbxXCConfigurationList()[target.buildConfigurationList]
+      .buildConfigurations).map(([, reference]) => project.pbxXCBuildConfigurationSection()[reference.value].buildSettings);
+    for (const settings of settingsOf(application.firstTarget)) settings.TARGETED_DEVICE_FAMILY = 1;
+    for (const settings of settingsOf(widget.pbxNativeTarget)) settings.TARGETED_DEVICE_FAMILY = '"1,2"';
+    await applyProjectMod(project);
+    const families = (name) => {
+      const [, target] = Object.entries(project.pbxNativeTargetSection())
+        .find(([key, value]) => !key.endsWith('_comment') && value.name.replaceAll('"', '') === name);
+      return settingsOf(target).map((settings) => String(settings.TARGETED_DEVICE_FAMILY));
+    };
+    assert.deepEqual(families('Widget'), ['1', '1']);
+    assert.deepEqual(families(application.firstTarget.name.replaceAll('"', '')), ['1', '1']);
+  });
+});
+
 test('unchanged dev launcher script strips only its release values and preserves debug and custom plist entries', async () => {
   await withTemplateProject(async (project) => {
     const config = withDevLauncher({});
@@ -335,10 +354,13 @@ test('app configuration carries the fork identity and never the ripples identity
   assert.equal(app.slug, 'habit-system');
   assert.equal(app.scheme, 'habitsystem');
   assert.equal(app.ios.bundleIdentifier, 'studio.orbitlabs.habitsystem');
-  assert.equal(app.ios.infoPlist.CFBundleDisplayName, 'Flint Local');
+  // the home screen name is flint; expo.name stays flint local (project name and flame palette)
+  assert.equal(app.ios.infoPlist.CFBundleDisplayName, 'Flint');
+  // the 1.0 store release is iphone only
+  assert.equal(app.ios.supportsTablet, false);
   const widgets = app.plugins.find((plugin) => Array.isArray(plugin) && plugin[0] === 'expo-widgets')[1];
   assert.equal(widgets.groupIdentifier, 'group.studio.orbitlabs.habitsystem');
-  assert.equal(widgets.widgets[0].displayName, 'Flint Local');
+  assert.equal(widgets.widgets[0].displayName, 'Flint');
   assert.equal(widgets.widgets[0].name, 'HabitSystemBoards');
   assert.equal(widgets.widgets[0].description, 'Your boards with seven-day strips and quick check-in.');
   // the app group is duplicated as a typescript constant; it must not drift from the plugin-derived value

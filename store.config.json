@@ -1,0 +1,66 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "version": "1.0.0",
+    "release": {
+      "automaticRelease": true
+    },
+    "info": {
+      "en-US": {
+        "title": "Flint: habit tracker",
+        "subtitle": "Keep small habits lit",
+        "description": "A habit is a small fire you keep lit. Flint gives every habit a board you check with one tap, and shows each day you showed up as a streak and a year of color.\n\nMiss a day and the half streak keeps going: one missed day is not the end of it, two in a row is. Stack habits that follow each other into a routine, earn coins for your check-ins, and spend them on rewards you choose.\n\nWidgets, reminders, a journal for each habit, and optional iCloud sync across your devices.\n\nPRIVATE BY DESIGN\nNo account, no ads and no analytics. Your habits are stored on your iPhone. If you turn on iCloud sync, they go to your own private iCloud account and nowhere else.\n\nFREE, WITH OPTIONAL SUPPORT\nEvery feature is free. An optional one-time donation supports development. It unlocks nothing, and there is no subscription.\n\nRequires iOS 18.6 or later.",
+        "keywords": [
+          "streak",
+          "routine",
+          "daily",
+          "goals",
+          "checklist",
+          "reminders",
+          "widget",
+          "journal",
+          "rewards",
+          "stack",
+          "consistency"
+        ],
+        "promoText": "Keep small habits lit. One missed day keeps your half streak going; two in a row resets it. Free, with an optional one-time donation.",
+        "privacyPolicyUrl": "https://flint.orbitlabs.studio/privacy",
+        "supportUrl": "https://flint.orbitlabs.studio/support",
+        "marketingUrl": "https://flint.orbitlabs.studio"
+      }
+    },
+    "advisory": {
+      "ageRatingOverride": "NONE",
+      "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+      "contests": "NONE",
+      "gambling": false,
+      "gamblingSimulated": "NONE",
+      "horrorOrFearThemes": "NONE",
+      "kidsAgeBand": null,
+      "koreaAgeRatingOverride": "NONE",
+      "lootBox": false,
+      "matureOrSuggestiveThemes": "NONE",
+      "medicalOrTreatmentInformation": "NONE",
+      "profanityOrCrudeHumor": "NONE",
+      "sexualContentGraphicAndNudity": "NONE",
+      "sexualContentOrNudity": "NONE",
+      "unrestrictedWebAccess": false,
+      "violenceCartoonOrFantasy": "NONE",
+      "violenceRealistic": "NONE",
+      "violenceRealisticProlongedGraphicOrSadistic": "NONE",
+      "advertising": false,
+      "ageAssurance": false,
+      "ageRatingOverrideV2": "NONE",
+      "developerAgeRatingInfoUrl": null,
+      "gunsOrOtherWeapons": "NONE",
+      "healthOrWellnessTopics": false,
+      "messagingAndChat": false,
+      "parentalControls": false,
+      "userGeneratedContent": false
+    },
+    "copyright": "2026 Rami Maalouf",
+    "categories": [
+      "HEALTH_AND_FITNESS"
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+steps:
+  - echo: Replace the database with fifteen months of store data that ends today. goldie reinstalls the app once per capture, and the app group container that holds the database survives that reinstall.
+  - script: { path: ../../goldie/seed/install-store-data.mjs, timeout: 120000 }
+  - launch: studio.orbitlabs.habitsystem
+  - await: { visible: { text: Drink water }, timeout: 15000 }
+  - tap: { id: coin-balance-pill }
+  - await: { visible: { text: Available balance } }
+  - await: { idle: true }

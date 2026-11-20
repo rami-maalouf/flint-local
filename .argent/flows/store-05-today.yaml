@@ -1,0 +1,14 @@
+steps:
+  - echo: Replace the database with fifteen months of store data that ends today. goldie reinstalls the app once per capture, and the app group container that holds the database survives that reinstall.
+  - script: { path: ../../goldie/seed/install-store-data.mjs, timeout: 120000 }
+  - launch: studio.orbitlabs.habitsystem
+  - await: { visible: { text: Drink water }, timeout: 15000 }
+  - echo: Compact rows is the default layout after the reinstall; choose it anyway so the flow also replays on its own.
+  - tap: { id: open-board-layout }
+  - await: { visible: { id: done-board-layout } }
+  - echo: The layout picker is a native SwiftUI control the runner cannot select by id (layout-compact), so tap its "Compact rows" segment by position, read from describe on an iPhone 17 Pro Max.
+  - tap: { x: 0.504, y: 0.912 }
+  - wait: 400
+  - tap: { id: done-board-layout }
+  - await: { hidden: { id: done-board-layout } }
+  - await: { idle: true }

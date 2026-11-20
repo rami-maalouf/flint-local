@@ -1,6 +1,7 @@
-// validated https release links; a development build carries none, and the
-// spec requires an explicit missing-link state instead of a dead tap.
-// production validation fails when a required value is absent.
+// validated https release links. a key without a value shows the spec's
+// explicit missing-link state instead of a dead tap; nothing else enforces
+// them. the app store review and more-products links wait for the app store
+// app id, which exists only after the app store connect record is created.
 
 export type ReleaseLinkKey =
   | 'feedback'
@@ -10,11 +11,12 @@ export type ReleaseLinkKey =
   | 'termsOfUse';
 
 const RELEASE_LINKS: Record<ReleaseLinkKey, string | null> = {
-  feedback: null,
+  feedback: 'https://flint.orbitlabs.studio/support',
   appStoreReview: null,
   moreProducts: null,
-  privacyPolicy: null,
-  termsOfUse: null,
+  privacyPolicy: 'https://flint.orbitlabs.studio/privacy',
+  // the website has no terms of its own; apple's standard eula applies
+  termsOfUse: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
 };
 
 export function releaseLink(

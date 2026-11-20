@@ -1,0 +1,10 @@
+executionPrerequisite: The Read a page board, scrolled, from store-preview-03-streak.
+steps:
+  - echo: goldie pins the status bar again as each clip starts and iOS redraws it for about a second, so hold still while it settles; that second is trimmed off before goldie preview.
+  - wait: 1200
+  - tap: { id: BackButton }
+  - await: { visible: { id: coin-balance-pill } }
+  - wait: 700
+  - tap: { id: coin-balance-pill }
+  - await: { visible: { text: Available balance } }
+  - wait: 2400

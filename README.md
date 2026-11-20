@@ -1,10 +1,10 @@
 # Flint Local
 
-A private, local-first habit tracker for iOS, built with Expo and React Native. Flint Local combines daily habits, same-day stacks, coins, and rewards you define. A fresh install starts empty.
+A private, local-first habit tracker for iOS, built with Expo and React Native. On the iPhone and in the App Store it is called Flint ("Flint: habit tracker"); the repository and the generated Xcode project keep the name Flint Local. Flint Local combines daily habits, same-day stacks, coins, and rewards you define. A fresh install starts empty.
 
 This is a full-history fork of [Ripples](https://github.com/rami-maalouf/habit-tracker). [FORK.md](FORK.md) records the origin and the separate Flint Local app, App Group, and CloudKit identities.
 
-The app's design direction is monochrome: black, white, and system Liquid Glass, with no fixed accent-color theme.
+The app's design direction is monochrome: black, white, and system Liquid Glass, with no fixed accent-color theme. The mark is a glossy flame, rendered from one script in `brand/`; [docs/brand.md](docs/brand.md) has the palettes and assets. The website for flint.orbitlabs.studio is in [website/](website/README.md).
 
 For the full-stack app with Snapback account sync, see [Flint](https://github.com/rami-maalouf/flint). Both apps keep their existing installed identities and backup format so the rename preserves existing data.
 
@@ -19,6 +19,7 @@ For the full-stack app with Snapback account sync, see [Flint](https://github.co
 - Version 2 JSON backups restore habit configuration, checks, rewards, and immutable action/coin history. Version 1 JSON and Ripples CSV imports remain supported.
 - Private CloudKit sync is off by default. Version 2 accepts supported version 1 records; older app versions must be upgraded before sharing version 2 data.
 - Light and dark appearance, Dynamic Type, and accessible controls are part of the iOS implementation.
+- Every feature is free. Settings > Support Flint offers an optional one-time donation through StoreKit (`modules/tip-jar`); it unlocks nothing and restores through the Apple Account.
 
 The real app stores product data in SQLite inside its own iOS App Group. Widgets and App Intents use the same store. Restoring checks does not mint new earnings, and local notification bookkeeping is excluded from sync and backups.
 
@@ -28,7 +29,9 @@ The real app stores product data in SQLite inside its own iOS App Group. Widgets
 
 The habit, stack, coin, reward, backup/restore, and miss-alert milestones are implemented and reviewed. The deterministic three-year sample dataset and isolated in-memory factory have passed automated and iOS simulator checks. Sample navigation, native sheets, editing, claims, disposal and real-data isolation have passed automated and iOS simulator checks. T24 cosmetics, regressions, production exports and native build checks pass, including a fresh simulator launch. The signed iPhone installation and exact provisioning/capability checks pass. First phone launch still needs the phone unlocked; live two-device sync remains open. The sample database scheduling change reduces measured iOS simulator startup from about 51 seconds to 20 seconds while preserving the exact generated data.
 
-Local sync tests and simulator checks do not establish live CloudKit convergence. T19's actual two-target service acceptance, physical launch verification, and Checkpoint C remain open. This repository does not claim final release acceptance or a published App Store listing.
+Local sync tests and simulator checks do not establish live CloudKit convergence. On 2026-11-20 the owner reported that iCloud sync works on physical devices ("owner verified on physical devices"). That report is recorded in [checkpoints.md](checkpoints.md); the repository holds no device evidence of its own for it, so T19's formal two-target acceptance and Checkpoint C stay as recorded there. iCloud sync ships in 1.0 off by default, and the person turns it on in Settings > iCloud Sync.
+
+Version 1.0.0 is being prepared for the App Store as "Flint: habit tracker", iPhone only, free with an optional one-time donation. [docs/release-1.0.md](docs/release-1.0.md) holds the release plan and what is still open. This repository does not claim final release acceptance or a published App Store listing.
 
 ## Development
 
