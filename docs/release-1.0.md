@@ -43,7 +43,7 @@ The owner creates the record and the parent agent runs builds and submissions. T
 3. An active Paid Apps Agreement with tax and banking details. StoreKit returns no product without it, and the screen then shows "Donations are unavailable right now".
 4. The listing in `store.config.json` (push it with `bunx eas-cli metadata:push`). The first version cannot carry release notes, so the file has none.
 5. `eas.json` `submit.production` has no `ascAppId` yet. Add it after the record exists.
-6. Release: `store.config.json` sets a manual release after approval.
+6. Release: the owner chose an automatic release after approval (`automaticRelease: true`) and Health & Fitness as the primary category (`categories` in `store.config.json`).
 
 Reviewer notes (keep private details in App Store Connect): no account is needed; iCloud sync is optional in Settings > iCloud Sync; the donation is in Settings > Support Flint and unlocks nothing; Settings > Utilities > Try a sample opens a full sample without touching real data.
 
