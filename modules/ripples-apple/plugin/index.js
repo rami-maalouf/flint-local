@@ -75,6 +75,28 @@ async function writeAlternateIcons(projectRoot, catalogDirectory) {
   }
 }
 
+// expo-widgets hardcodes a universal device family on its extension. every
+// embedded target follows the application's family instead, so an iphone-only
+// app (ios.supportsTablet false) never embeds an ipad-capable widget.
+function alignEmbeddedDeviceFamily(project, applicationTarget) {
+  const configurations = (target) => IOSConfig.XcodeUtils
+    .getBuildConfigurationsForListId(project, target.buildConfigurationList)
+    .map(([, configuration]) => configuration);
+  const families = new Set(configurations(applicationTarget)
+    .map((configuration) => configuration.buildSettings.TARGETED_DEVICE_FAMILY)
+    .filter((family) => family !== undefined));
+  if (families.size !== 1) return;
+  const [family] = families;
+  for (const [, target] of IOSConfig.Target.getNativeTargets(project)) {
+    if (target === applicationTarget) continue;
+    for (const configuration of configurations(target)) {
+      if (configuration.buildSettings.TARGETED_DEVICE_FAMILY !== undefined) {
+        configuration.buildSettings.TARGETED_DEVICE_FAMILY = family;
+      }
+    }
+  }
+}
+
 function withRipplesApple(config) {
   const bundleIdentifier = config.ios?.bundleIdentifier;
   if (!bundleIdentifier) throw new Error('ripples-apple requires ios.bundleIdentifier');
@@ -141,6 +163,7 @@ function withRipplesApple(config) {
     target.buildPhases.push(devLauncherReference);
     devLauncherPhase.inputPaths = ['"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)"'];
     devLauncherPhase.alwaysOutOfDate = 1;
+    alignEmbeddedDeviceFamily(project, target);
     await fs.writeFile(project.filepath, project.writeSync());
     return mod;
   }]);

@@ -136,6 +136,25 @@ test('dev launcher ordering is finalized after a later widget xcode mod appends 
   });
 });
 
+test('embedded extensions follow the application device family, so an iphone-only app embeds an iphone-only widget', async () => {
+  await withTemplateProject(async (project) => {
+    const application = project.getFirstTarget();
+    const widget = project.addTarget('Widget', 'app_extension', 'Widget', 'studio.orbitlabs.habitsystem.Widget');
+    const settingsOf = (target) => Object.entries(project.pbxXCConfigurationList()[target.buildConfigurationList]
+      .buildConfigurations).map(([, reference]) => project.pbxXCBuildConfigurationSection()[reference.value].buildSettings);
+    for (const settings of settingsOf(application.firstTarget)) settings.TARGETED_DEVICE_FAMILY = 1;
+    for (const settings of settingsOf(widget.pbxNativeTarget)) settings.TARGETED_DEVICE_FAMILY = '"1,2"';
+    await applyProjectMod(project);
+    const families = (name) => {
+      const [, target] = Object.entries(project.pbxNativeTargetSection())
+        .find(([key, value]) => !key.endsWith('_comment') && value.name.replaceAll('"', '') === name);
+      return settingsOf(target).map((settings) => String(settings.TARGETED_DEVICE_FAMILY));
+    };
+    assert.deepEqual(families('Widget'), ['1', '1']);
+    assert.deepEqual(families(application.firstTarget.name.replaceAll('"', '')), ['1', '1']);
+  });
+});
+
 test('unchanged dev launcher script strips only its release values and preserves debug and custom plist entries', async () => {
   await withTemplateProject(async (project) => {
     const config = withDevLauncher({});
