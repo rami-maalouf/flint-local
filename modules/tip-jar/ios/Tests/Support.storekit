@@ -1,0 +1,35 @@
+{
+  "identifier" : "FLINT-LOCAL-TIP",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "1.99",
+      "familyShareable" : false,
+      "internalID" : "FLINT-LOCAL-SUPPORT",
+      "localizations" : [
+        {
+          "description" : "A one-time donation to support Flint Local. It unlocks nothing: every feature stays free.",
+          "displayName" : "Support Flint Local",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "studio.orbitlabs.habitsystem.tip.developer.support",
+      "referenceName" : "Support Flint Local",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA"
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

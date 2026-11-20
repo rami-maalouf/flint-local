@@ -109,6 +109,7 @@ const unavailable = [
   ['settings/sync', 'iCloud Sync is disabled in sample mode.'],
   ['settings/icons', 'App icons are disabled in sample mode.'],
   ['settings/notifications', 'Notifications are disabled in sample mode.'],
+  ['settings/support', 'Donations are disabled in sample mode.'],
   ['boards/:board/reminders/new', 'Reminders are unavailable in Sample mode.'],
   ['boards/:board/reminders/00000000-0000-4000-8000-000000000001', 'Reminders are unavailable in Sample mode.'],
   ['boards/:board/quick-action', 'Widget actions are disabled in sample mode.'],

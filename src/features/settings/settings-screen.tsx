@@ -4,6 +4,7 @@ import { ScrollView, View } from 'react-native';
 
 import { AppText } from '@/components/foundation/app-text';
 import { getExportMeta } from '@/platform/app-metadata';
+import { tipJar } from '@/platform/tip-jar';
 import { semanticColor, spacing } from '@/theme';
 
 import { useScheme } from '../ui';
@@ -80,6 +81,11 @@ export function SettingsScreen() {
         </SettingsGroup>
 
         <SettingsGroup title="Support and Feedback">
+          {tipJar.supported() ? <SettingsRow
+            title="Support Flint Local"
+            onPress={() => router.push('/settings/support')}
+            testID="settings-support"
+          /> : null}
           <SettingsRow
             title="Request feature or report issue"
             onPress={() => openLink('feedback', 'Request feature or report issue')}

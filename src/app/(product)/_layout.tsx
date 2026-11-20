@@ -69,6 +69,7 @@ export default function ProductLayout() {
           <Stack.Screen name="settings/icons" options={sheet} />
           <Stack.Screen name="settings/export" options={sheet} />
           <Stack.Screen name="settings/timeline" options={sheet} />
+          <Stack.Screen name="settings/support" options={sheet} />
         </Stack>
       </ProductProvider>
   );
