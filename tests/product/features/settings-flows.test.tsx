@@ -68,10 +68,10 @@ describe('settings sheet', () => {
 
   it('shows the explicit missing-release-link state', async () => {
     renderRouter('src/app', { initialUrl: '/settings' });
-    await screen.findByTestId('settings-feedback');
-    await press('settings-feedback');
+    await screen.findByTestId('settings-more-products');
+    await press('settings-more-products');
     expect(screen.getByTestId('settings-link-notice')).toHaveTextContent(
-      'Missing release link for Request feature or report issue.',
+      'Missing release link for More products by us.',
     );
     // the notice must render above the scroll content, or a tap near the
     // top of a long settings list appears to do nothing
@@ -273,6 +273,18 @@ describe('import flow', () => {
 });
 
 describe('release link validation', () => {
+  it('ships the website privacy and support pages and apple\'s standard eula', () => {
+    const { releaseLink } = jest.requireActual<
+      typeof import('../../../src/features/settings/release-links')
+    >('../../../src/features/settings/release-links');
+    expect(releaseLink('privacyPolicy')).toBe('https://flint.orbitlabs.studio/privacy');
+    expect(releaseLink('feedback')).toBe('https://flint.orbitlabs.studio/support');
+    expect(releaseLink('termsOfUse')).toBe('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/');
+    // both wait for the app store app id
+    expect(releaseLink('appStoreReview')).toBeNull();
+    expect(releaseLink('moreProducts')).toBeNull();
+  });
+
   it('returns https links, rejects other schemes, and passes null through', () => {
     const { releaseLink } = jest.requireActual<
       typeof import('../../../src/features/settings/release-links')

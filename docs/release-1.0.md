@@ -57,13 +57,13 @@ Use this list for the App Privacy questionnaire. The app has no analytics, adver
 | CloudKit account status (Apple) | When Settings > iCloud Sync is open, and in each sync pass | The iCloud account status only |
 | EAS Update (`u.expo.dev`, Expo) | On every launch (`checkOnLaunch: ALWAYS`), while `expo-updates` is on | Platform, runtime version 1.0.0, the channel, the current and embedded update IDs, and `EAS-Client-ID`: a random ID that `expo-updates` creates on the device. No habit data. |
 | StoreKit (Apple) | When Settings > Support Flint is open, on purchase, on restore, and through `Transaction.updates` | Product lookup, the purchase and its verified transaction. Apple processes the payment; the app keeps no receipt. |
-| In-app browser (Safari view) | Only when the person taps an external Settings link | The page request. All release links are empty today (see below). |
+| In-app browser (Safari view) | Only when the person taps an external Settings link | The page request: the website privacy or support page, or Apple's EULA |
 
 Reminders and missed-day alerts are local notifications. The app never asks for a push token, although the `aps-environment` entitlement is present.
 
 ## Open before submission
 
-- **In-app links.** Every value in `src/features/settings/release-links.ts` is `null`. In the Release build, Privacy Policy, Terms Of Use, Rate, feedback and More products show "Missing release link". Apple expects the privacy policy to be reachable inside the app. Proposed values: privacy `https://flint.orbitlabs.studio/privacy`, feedback `https://flint.orbitlabs.studio/support`, terms Apple's standard EULA, rate `https://apps.apple.com/app/id<app id>?action=write-review` once the record exists.
+- **In-app links.** `src/features/settings/release-links.ts` now opens `https://flint.orbitlabs.studio/privacy` (Privacy Policy), `https://flint.orbitlabs.studio/support` (Request feature or report issue) and Apple's standard EULA (Terms Of Use). Rate Flint In App Store and More products by us stay `null` until the App Store app ID exists, and show "Missing release link" when tapped. No production check enforces these values, so they do not block a build. Set the review link to `https://apps.apple.com/app/id<app id>?action=write-review` once the record exists. On November 20 the live site still served the old full-stack privacy text.
 - **Website.** `website/src/privacy.html`, `support.html` and the home page now describe the app that ships: no account or server, optional private iCloud sync, the donation, and EAS Update. The site is not deployed from this branch; deploy it (`website/deploy.sh`) before submission so the listing's privacy and support URLs show this text.
 - **EAS Update channel.** The store build listens on the `production` channel with runtime version 1.0.0. An update already published there for 1.0.0 replaces the build's JavaScript after the first launch. Check the channel before release.
 
