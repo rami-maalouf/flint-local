@@ -1,0 +1,10 @@
+executionPrerequisite: Home in the two-column grid, from store-preview-02-grid.
+steps:
+  - echo: goldie pins the status bar again as each clip starts and iOS redraws it for about a second, so hold still while it settles; that second is trimmed off before goldie preview.
+  - wait: 1200
+  - tap: { text: Read a page }
+  - await: { visible: { id: open-journal } }
+  - wait: 2200
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.72, toX: 0.5, toY: 0.42, durationMs: 900 }
+  - wait: 1800

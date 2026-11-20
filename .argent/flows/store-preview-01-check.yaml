@@ -1,0 +1,11 @@
+executionPrerequisite: >-
+  App freshly restarted by goldie after the screenshot flows, settled on home in
+  compact rows with the store data from goldie/seed (Take a walk not yet checked today).
+steps:
+  - await: { visible: { text: Take a walk } }
+  - echo: goldie pins the status bar again as each clip starts, and iOS animates it for about 1.5 s, so the clip starts idle.
+  - wait: 2600
+  - tap: { id: board-card-4-quick }
+  - wait: 1600
+  - tap: { id: board-card-6-quick }
+  - wait: 1400

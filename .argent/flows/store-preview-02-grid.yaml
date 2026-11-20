@@ -1,0 +1,13 @@
+executionPrerequisite: Home in compact rows, from store-preview-01-check.
+steps:
+  - echo: goldie pins the status bar again as each clip starts and iOS redraws it for about a second, so hold still while it settles; that second is trimmed off before goldie preview.
+  - wait: 1200
+  - tap: { id: open-board-layout }
+  - await: { visible: { id: done-board-layout } }
+  - wait: 600
+  - echo: The layout picker is a native SwiftUI control the runner cannot select by id (layout-grid), so tap its "Two-column grid" segment by position, read from describe on an iPhone 17 Pro Max.
+  - tap: { x: 0.358, y: 0.912 }
+  - wait: 900
+  - tap: { id: done-board-layout }
+  - await: { hidden: { id: done-board-layout } }
+  - wait: 1800

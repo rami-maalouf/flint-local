@@ -15,5 +15,5 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ],
-  "exclude": ["node_modules", "brand", "website"]
+  "exclude": ["node_modules", "brand", "website", "goldie"]
 }
