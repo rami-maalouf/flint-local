@@ -8,7 +8,7 @@
     "scheme": "habitsystem",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "deploymentTarget": "18.6",
       "bundleIdentifier": "studio.orbitlabs.habitsystem",
       "infoPlist": {

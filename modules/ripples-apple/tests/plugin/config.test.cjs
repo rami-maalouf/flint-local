@@ -336,6 +336,8 @@ test('app configuration carries the fork identity and never the ripples identity
   assert.equal(app.scheme, 'habitsystem');
   assert.equal(app.ios.bundleIdentifier, 'studio.orbitlabs.habitsystem');
   assert.equal(app.ios.infoPlist.CFBundleDisplayName, 'Flint Local');
+  // the 1.0 store release is iphone only
+  assert.equal(app.ios.supportsTablet, false);
   const widgets = app.plugins.find((plugin) => Array.isArray(plugin) && plugin[0] === 'expo-widgets')[1];
   assert.equal(widgets.groupIdentifier, 'group.studio.orbitlabs.habitsystem');
   assert.equal(widgets.widgets[0].displayName, 'Flint Local');
