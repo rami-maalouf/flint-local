@@ -64,7 +64,7 @@ Reminders and missed-day alerts are local notifications. The app never asks for 
 ## Open before submission
 
 - **In-app links.** Every value in `src/features/settings/release-links.ts` is `null`. In the Release build, Privacy Policy, Terms Of Use, Rate, feedback and More products show "Missing release link". Apple expects the privacy policy to be reachable inside the app. Proposed values: privacy `https://flint.orbitlabs.studio/privacy`, feedback `https://flint.orbitlabs.studio/support`, terms Apple's standard EULA, rate `https://apps.apple.com/app/id<app id>?action=write-review` once the record exists.
-- **Privacy policy text.** `website/src/privacy.html` describes the full-stack Flint: an account, a sync server and AI assistants. Flint Local has none of these. It has iCloud sync and the donation, which the page does not mention. The listing's privacy URL must describe this app.
+- **Website.** `website/src/privacy.html`, `support.html` and the home page now describe the app that ships: no account or server, optional private iCloud sync, the donation, and EAS Update. The site is not deployed from this branch; deploy it (`website/deploy.sh`) before submission so the listing's privacy and support URLs show this text.
 - **EAS Update channel.** The store build listens on the `production` channel with runtime version 1.0.0. An update already published there for 1.0.0 replaces the build's JavaScript after the first launch. Check the channel before release.
 
 ## Validation
