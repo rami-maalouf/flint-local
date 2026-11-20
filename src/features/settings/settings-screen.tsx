@@ -82,7 +82,7 @@ export function SettingsScreen() {
 
         <SettingsGroup title="Support and Feedback">
           {tipJar.supported() ? <SettingsRow
-            title="Support Flint Local"
+            title="Support Flint"
             onPress={() => router.push('/settings/support')}
             testID="settings-support"
           /> : null}
@@ -93,8 +93,8 @@ export function SettingsScreen() {
             testID="settings-feedback"
           />
           <SettingsRow
-            title="Rate Flint Local In App Store"
-            onPress={() => openLink('appStoreReview', 'Rate Flint Local In App Store')}
+            title="Rate Flint In App Store"
+            onPress={() => openLink('appStoreReview', 'Rate Flint In App Store')}
             external
             testID="settings-rate"
           />

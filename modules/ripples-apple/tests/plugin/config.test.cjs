@@ -354,12 +354,13 @@ test('app configuration carries the fork identity and never the ripples identity
   assert.equal(app.slug, 'habit-system');
   assert.equal(app.scheme, 'habitsystem');
   assert.equal(app.ios.bundleIdentifier, 'studio.orbitlabs.habitsystem');
-  assert.equal(app.ios.infoPlist.CFBundleDisplayName, 'Flint Local');
+  // the home screen name is flint; expo.name stays flint local (project name and flame palette)
+  assert.equal(app.ios.infoPlist.CFBundleDisplayName, 'Flint');
   // the 1.0 store release is iphone only
   assert.equal(app.ios.supportsTablet, false);
   const widgets = app.plugins.find((plugin) => Array.isArray(plugin) && plugin[0] === 'expo-widgets')[1];
   assert.equal(widgets.groupIdentifier, 'group.studio.orbitlabs.habitsystem');
-  assert.equal(widgets.widgets[0].displayName, 'Flint Local');
+  assert.equal(widgets.widgets[0].displayName, 'Flint');
   assert.equal(widgets.widgets[0].name, 'HabitSystemBoards');
   assert.equal(widgets.widgets[0].description, 'Your boards with seven-day strips and quick check-in.');
   // the app group is duplicated as a typescript constant; it must not drift from the plugin-derived value

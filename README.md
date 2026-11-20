@@ -1,6 +1,6 @@
 # Flint Local
 
-A private, local-first habit tracker for iOS, built with Expo and React Native. Flint Local combines daily habits, same-day stacks, coins, and rewards you define. A fresh install starts empty.
+A private, local-first habit tracker for iOS, built with Expo and React Native. On the iPhone and in the App Store it is called Flint ("Flint: habit tracker"); the repository and the generated Xcode project keep the name Flint Local. Flint Local combines daily habits, same-day stacks, coins, and rewards you define. A fresh install starts empty.
 
 This is a full-history fork of [Ripples](https://github.com/rami-maalouf/habit-tracker). [FORK.md](FORK.md) records the origin and the separate Flint Local app, App Group, and CloudKit identities.
 
@@ -19,7 +19,7 @@ For the full-stack app with Snapback account sync, see [Flint](https://github.co
 - Version 2 JSON backups restore habit configuration, checks, rewards, and immutable action/coin history. Version 1 JSON and Ripples CSV imports remain supported.
 - Private CloudKit sync is off by default. Version 2 accepts supported version 1 records; older app versions must be upgraded before sharing version 2 data.
 - Light and dark appearance, Dynamic Type, and accessible controls are part of the iOS implementation.
-- Every feature is free. Settings > Support Flint Local offers an optional one-time donation through StoreKit (`modules/tip-jar`); it unlocks nothing and restores through the Apple Account.
+- Every feature is free. Settings > Support Flint offers an optional one-time donation through StoreKit (`modules/tip-jar`); it unlocks nothing and restores through the Apple Account.
 
 The real app stores product data in SQLite inside its own iOS App Group. Widgets and App Intents use the same store. Restoring checks does not mint new earnings, and local notification bookkeeping is excluded from sync and backups.
 

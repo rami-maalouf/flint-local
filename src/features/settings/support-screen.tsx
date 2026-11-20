@@ -16,11 +16,11 @@ import { useSettingsActivity } from './use-settings-activity';
 // thanks the person and restores the thank-you on another device.
 export function SupportScreen() {
   const { scope } = useProduct();
-  if (scope.kind === 'sample') return <SampleDisabledScreen title="Support Flint Local" message="Donations are disabled in sample mode." />;
+  if (scope.kind === 'sample') return <SampleDisabledScreen title="Support Flint" message="Donations are disabled in sample mode." />;
   return <SupportBody />;
 }
 
-const UNAVAILABLE = 'Donations are unavailable right now. Every feature of Flint Local stays free.';
+const UNAVAILABLE = 'Donations are unavailable right now. Every feature of Flint stays free.';
 const OFFLINE = "Couldn't connect to the App Store. Try again when you're online.";
 const FAILED = "The App Store couldn't complete this request. Try again, or use Restore Purchase for an earlier donation.";
 const PENDING = 'Your donation is waiting for approval from Apple. Thank you for your support.';
@@ -96,7 +96,7 @@ function SupportBody() {
 
   return (
     <View style={{ flex: 1, backgroundColor: semanticColor('groupedBackground', scheme) }}>
-      <Stack.Screen options={{ title: 'Support Flint Local' }} />
+      <Stack.Screen options={{ title: 'Support Flint' }} />
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={{ padding: spacing.lg, gap: spacing.xl }}
@@ -119,7 +119,7 @@ function SupportBody() {
             Keep the flame going
           </AppText>
           <AppText style={{ color: secondary, textAlign: 'center' }}>
-            Flint Local is free, and every feature stays free. If it helps you keep your habits lit, a
+            Flint is free, and every feature stays free. If it helps you keep your habits lit, a
             one-time donation helps me keep improving it.
           </AppText>
           <AppText style={{ color: secondary, textAlign: 'center' }}>Thank you for using it. - Rami</AppText>

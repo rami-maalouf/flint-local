@@ -96,7 +96,7 @@ private enum TipJarError: LocalizedError {
   var errorDescription: String? {
     switch self {
     case .unavailable:
-      return "Donations are unavailable right now. Every Flint Local feature is still free."
+      return "Donations are unavailable right now. Every Flint feature is still free."
     case .unverified:
       return "The App Store could not verify the purchase. Please try Restore Purchase."
     case .purchaseInProgress:

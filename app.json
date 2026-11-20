@@ -13,7 +13,7 @@
       "bundleIdentifier": "studio.orbitlabs.habitsystem",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "CFBundleDisplayName": "Flint Local"
+        "CFBundleDisplayName": "Flint"
       },
       "appleTeamId": "3V2UU7RRK9"
     },
@@ -57,7 +57,7 @@
           "widgets": [
             {
               "name": "HabitSystemBoards",
-              "displayName": "Flint Local",
+              "displayName": "Flint",
               "description": "Your boards with seven-day strips and quick check-in.",
               "supportedFamilies": [
                 "systemSmall",

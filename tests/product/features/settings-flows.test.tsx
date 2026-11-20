@@ -80,10 +80,10 @@ describe('settings sheet', () => {
     expect(rendered.indexOf('settings-link-notice')).toBeLessThan(
       rendered.indexOf('settings-notifications'),
     );
-    expect(screen.getByTestId('settings-rate')).toHaveTextContent(/Rate Flint Local In App Store/);
+    expect(screen.getByTestId('settings-rate')).toHaveTextContent(/Rate Flint In App Store/);
     await press('settings-rate');
     expect(screen.getByTestId('settings-link-notice')).toHaveTextContent(
-      'Missing release link for Rate Flint Local In App Store.',
+      'Missing release link for Rate Flint In App Store.',
     );
   });
 

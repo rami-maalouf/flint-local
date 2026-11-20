@@ -10,13 +10,13 @@
       "internalID" : "FLINT-LOCAL-SUPPORT",
       "localizations" : [
         {
-          "description" : "A one-time donation to support Flint Local. It unlocks nothing: every feature stays free.",
-          "displayName" : "Support Flint Local",
+          "description" : "A one-time donation to support Flint. It unlocks nothing: every feature stays free.",
+          "displayName" : "Support Flint",
           "locale" : "en_US"
         }
       ],
       "productID" : "studio.orbitlabs.habitsystem.tip.developer.support",
-      "referenceName" : "Support Flint Local",
+      "referenceName" : "Support Flint",
       "type" : "NonConsumable"
     }
   ],
