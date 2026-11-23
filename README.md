@@ -1,6 +1,6 @@
 # Flint Local
 
-A private, local-first habit tracker for iOS, built with Expo and React Native. Flint Local combines daily habits, same-day stacks, coins, and rewards you define. A fresh install starts empty.
+A private, local-first habit tracker for iOS, built with Expo and React Native. Your habit data stays on your device and, if you turn on sync, your own iCloud account; the app itself sends only anonymous diagnostics (see [Privacy](#privacy)). Flint Local combines daily habits, same-day stacks, coins, and rewards you define. A fresh install starts empty.
 
 This is a full-history fork of [Ripples](https://github.com/rami-maalouf/habit-tracker). [FORK.md](FORK.md) records the origin and the separate Flint Local app, App Group, and CloudKit identities.
 
@@ -21,6 +21,20 @@ For the full-stack app with Snapback account sync, see [Flint](https://github.co
 - Light and dark appearance, Dynamic Type, and accessible controls are part of the iOS implementation.
 
 The real app stores product data in SQLite inside its own iOS App Group. Widgets and App Intents use the same store. Restoring checks does not mint new earnings, and local notification bookkeeping is excluded from sync and backups.
+
+## Privacy
+
+Your habits, check-ins, notes, reminders, coins, and rewards stay on your device. They go to your own private iCloud account only when you turn on iCloud Sync. The app has no account, no ads, and no tracking.
+
+Release builds send anonymous diagnostics to Expo Observe (EAS Observe), Expo's app monitoring service, so that slow screens and crashes can be found and fixed:
+
+- performance metrics: launch, render, and per-screen ready times, plus battery, thermal, and network state at launch
+- crash and error reports: the error type, message, and stack trace
+- the screens you open, by route pattern (for example `/boards/[boardId]`), without board, check-in, or reward ids
+- device model, operating system version, language, and app version
+- a random ID for this installation, which is not linked to you and resets when you reinstall the app
+
+The app does not add your habit names, notes, or other content you enter to these reports, and it sends no name, email address, or account. Expo also stores the IP address of each upload and the country derived from it. Expo keeps this data for about 90 days, processes it only on our behalf, and does not use it for tracking or advertising.
 
 ## Implementation and acceptance
 

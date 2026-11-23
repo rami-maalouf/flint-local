@@ -98,7 +98,7 @@ function ICloudBody() {
       }
       Alert.alert(
         'Turn on iCloud Sync?',
-        'Your boards, check-ins, notes, and reminders are stored in your own private iCloud account. Nothing is sent anywhere else.',
+        'Your boards, check-ins, notes, and reminders are stored in your own private iCloud account and are not sent anywhere else.',
         [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Turn On', onPress: apply },
@@ -208,8 +208,8 @@ function ICloudBody() {
           </AppText>
         ) : null}
         <AppText variant="footnote">
-          Local use never depends on iCloud. Turning sync off keeps all of your data on this
-          device.
+          Local use never depends on iCloud. Turning sync off keeps all of your habit data on
+          this device.
         </AppText>
       </ScrollView>
     </View>

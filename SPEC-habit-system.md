@@ -73,11 +73,19 @@ Rami stops using the paper block and the jar within the first week of installing
 - Exporting into the Obsidian daily note
 - macOS-specific UI (the iPhone/iPad build runs on Apple Silicon Macs as "Designed for iPad")
 - Android UI
-- Everything Ripples already lists as out of scope, except the gamification line replaced above
+- Everything Ripples already lists as out of scope, except the gamification line replaced above and the telemetry item replaced by the Expo Observe diagnostics in section 2. Advertising and growth analytics stay out of scope.
 
 ## 2. Tech stack
 
-Unchanged from the inherited specs: Expo SDK 57 with Continuous Native Generation, Expo Router, React Native 0.86, React 19, TypeScript 6, `@expo/ui`, `expo-sqlite` in an App Group, `expo-widgets`, `expo-notifications`, `react-native-svg`, Reanimated 4, Bun. One local native module `modules/ripples-apple` (rename is a later cosmetic task). No new runtime dependency is approved by this document.
+Unchanged from the inherited specs: Expo SDK 57 with Continuous Native Generation, Expo Router, React Native 0.86, React 19, TypeScript 6, `@expo/ui`, `expo-sqlite` in an App Group, `expo-widgets`, `expo-notifications`, `react-native-svg`, Reanimated 4, Bun. One local native module `modules/ripples-apple` (rename is a later cosmetic task). No new runtime dependency is approved by this document, except the one below.
+
+**Diagnostics (approved by Rami on 2026-11-22).** `expo-observe` reports anonymous performance metrics, JavaScript errors, and native crashes from release builds to Expo Observe. This replaces the inherited "telemetry" out-of-scope item in SPEC-ripples-product.md. The rules:
+
+- Reports carry no habit content: no titles, notes, amounts, reward names, or notification text. Handled errors go through `reportHandledError` in `src/platform/diagnostics`, which redacts ids and email addresses; callers pass error codes, never domain messages that can contain user text.
+- The Expo Router integration filters record ids (`boardId`, `checkInId`, `reminderId`, `rewardId`, `rootId`) out of route params, so only route patterns leave the device.
+- No network traces, user-defined events, global attributes, or account identifiers. Adding any of them is an "ask first" change, and it must update the README Privacy section and the App Store privacy answers in the same commit.
+- `src/core` stays free of diagnostics code.
+- The README Privacy section is the user-facing statement of what leaves the device. The SQLite database stays the only source of truth, and local use never depends on the network.
 
 ## 3. Commands
 
