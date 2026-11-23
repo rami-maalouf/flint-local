@@ -28,14 +28,17 @@ describe('remote fact inbox database constraints', () => {
     const payload = 'café 漢\u0000z';
     const bytes = Buffer.byteLength(payload, 'utf8');
     expect(bytes).toBeGreaterThan(payload.length);
+    // compare the stored bytes as hex: a driver may decode text only up to the first null
+    const payloadHex = Buffer.from(payload, 'utf8').toString('hex').toUpperCase();
     await insert(h, { payload, payload_bytes: bytes });
-    expect(await h.db.getFirstAsync('SELECT payload, payload_bytes, enqueue_on_admission FROM remote_fact_inbox'))
-      .toEqual({ payload, payload_bytes: bytes, enqueue_on_admission: 0 });
+    expect(await h.db.getFirstAsync('SELECT hex(payload) AS payload_hex, payload_bytes, enqueue_on_admission FROM remote_fact_inbox'))
+      .toEqual({ payload_hex: payloadHex, payload_bytes: bytes, enqueue_on_admission: 0 });
     await expect(h.db.runAsync('UPDATE remote_fact_inbox SET payload_bytes = ?', [payload.length]))
       .rejects.toThrow('CHECK constraint failed');
     await expect(h.db.runAsync('UPDATE remote_fact_inbox SET payload = ?', [`${payload}x`]))
       .rejects.toThrow('CHECK constraint failed');
-    expect(await h.db.getFirstAsync('SELECT payload, payload_bytes FROM remote_fact_inbox')).toEqual({ payload, payload_bytes: bytes });
+    expect(await h.db.getFirstAsync('SELECT hex(payload) AS payload_hex, payload_bytes FROM remote_fact_inbox'))
+      .toEqual({ payload_hex: payloadHex, payload_bytes: bytes });
   });
 
   it('accepts exactly 786432 payload bytes and rejects one more, empty payloads, or noninteger counts', async () => {
