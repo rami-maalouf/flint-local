@@ -2,6 +2,7 @@ import { addUserInteractionListener } from 'expo-widgets';
 
 import type { WidgetProjectionSnapshot } from '@/core/domain/widget-projection';
 import { widgetPropsFromProjection } from '@/features/widgets/widget-props';
+import { reportHandledError } from '@/platform/diagnostics';
 
 import RipplesBoardsWidget from './ripples-boards-widget';
 
@@ -15,8 +16,10 @@ export async function refreshWidgets(snapshot: WidgetProjectionSnapshot): Promis
       { date: new Date(snapshot.generatedAtUtc), props },
       { date: new Date(snapshot.expiresAtUtc), props: { ...props, stale: true } },
     ]);
-  } catch {
-    // widget refresh is best effort; the app itself stays authoritative
+  } catch (cause) {
+    // widget refresh is best effort; the app itself stays authoritative, but
+    // a refresh that keeps failing leaves the home screen widget stale
+    reportHandledError('widgets', cause);
   }
 }
 

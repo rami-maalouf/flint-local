@@ -1,6 +1,7 @@
 import type { FetchPage, SyncFailureCode, SyncRecord, SyncTransport } from '@/core/sync/transport';
 import { SyncTransportError } from '@/core/sync/transport';
 import type { Schema2SyncRecord } from '@/core/sync/schema-2-records';
+import { reportHandledError } from '@/platform/diagnostics';
 
 import nativeModule from './cloudkit-native';
 
@@ -34,9 +35,11 @@ async function callNative<T>(operation: () => Promise<T>): Promise<T> {
     let code: unknown;
     try { code = typeof error === 'object' && error !== null && 'code' in error ? error.code : null; }
     catch { code = null; }
-    throw transportError(
-      code === 'offline' || code === 'signed_out' || code === 'unavailable' ? code : 'failure',
-    );
+    if (code === 'offline' || code === 'signed_out' || code === 'unavailable') throw transportError(code);
+    // offline, signed out, and unavailable are expected states; anything else
+    // (a rejected record, a schema mismatch, an invalid page) is a defect
+    reportHandledError('sync', error);
+    throw transportError('failure');
   }
 }
 

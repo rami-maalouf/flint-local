@@ -4,6 +4,7 @@ import type { DomainError } from '@/core/domain/result';
 import { captureImportDraft } from '@/core/export/import-capture';
 import { getImportPreview, type ImportDraft, type ImportPreview } from '@/core/export/import-parsers';
 import type { ProductCore } from '@/platform/database/product-core';
+import { reportHandledError } from '@/platform/diagnostics';
 
 export type ImportOwner = { active: boolean };
 type Details = ImportPreview & { fileName: string; source: ImportDraft['source']; exportVersion?: 1 | 2 };
@@ -74,7 +75,8 @@ class ImportAttemptStore {
         if (!result.error.retryable) this.attempt = null;
         this.publish({ ...view, phase: result.error.retryable ? 'uncertain' : 'failed', error: result.error });
       }
-    } catch {
+    } catch (cause) {
+      if (this.attempt === attempt) reportHandledError('import', cause);
       if (this.attempt === attempt) this.publish({ ...view, phase: 'uncertain',
         error: { code: 'database', message: 'The import response was interrupted. Try again.', retryable: true } });
     } finally {

@@ -5,6 +5,7 @@ import { ScrollView, View } from 'react-native';
 import { AppText } from '@/components/foundation/app-text';
 import { exportFileName, getExportSnapshot, serializeExport } from '@/core/export/serialize';
 import { getExportMeta } from '@/platform/app-metadata';
+import { reportHandledError } from '@/platform/diagnostics';
 import { semanticColor, spacing } from '@/theme';
 
 import { InlineError, PrimaryButton, useScheme } from '../ui';
@@ -48,8 +49,11 @@ function ExportBody() {
       if (!activity.active || !mounted.current || !dispatch.started) return;
       if (!dispatch.value.ok) setError(dispatch.value.error.message);
       else setShared(true);
-    } catch {
-      if (activity.active && mounted.current) setError('The export could not be shared. Try again.');
+    } catch (cause) {
+      if (activity.active && mounted.current) {
+        reportHandledError('export', cause);
+        setError('The export could not be shared. Try again.');
+      }
     } finally {
       busy.current = false;
       if (mounted.current) setExporting(false);

@@ -19,6 +19,7 @@ import {
   getBoardHeatmap,
   getBoardSummary,
 } from '@/core/domain/queries';
+import { useMarkInteractive } from '@/platform/diagnostics';
 import { radius, radiusCurve, semanticColor, semanticFallbacks, spacing } from '@/theme';
 
 import { deriveBoardColors } from './board-colors';
@@ -50,6 +51,8 @@ export function BoardDetailScreen({ boardId }: { boardId: BoardId }) {
   const board = useProductQuery((c) => getBoard(c, boardId), [boardId]);
   const summary = useProductQuery((c) => getBoardSummary(c, boardId), [boardId]);
   const heatmap = useProductQuery((c) => getBoardHeatmap(c, boardId), [boardId]);
+  // a reminder notification can open this screen directly
+  useMarkInteractive(board.status === 'ready');
   const [actionError, setActionError] = useState<string | null>(null);
   const [scrollHeaderReady, setScrollHeaderReady] = useState(false);
   const resetScrollHeader = useCallback((view: ScrollView | null) => {

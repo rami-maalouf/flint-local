@@ -12,6 +12,7 @@ import { setReminderEnabled } from '@/core/domain/reminder-commands';
 import type { DomainError } from '@/core/domain/result';
 import { getBoard, getBoardDependentCounts, listBoardReminders } from '@/core/domain/queries';
 import { minimumTouchTarget } from '@/foundation/accessibility';
+import { useMarkInteractive } from '@/platform/diagnostics';
 import { radius, radiusCurve, semanticColor, spacing } from '@/theme';
 
 import { BoardSymbol, SevenDayStrip, deriveBoardColors } from '../boards';
@@ -262,6 +263,8 @@ export function BoardFormScreen({ boardId }: { boardId: BoardId | null }) {
   // else means seeding has not landed yet or another sheet owned the store
   const draftMatches =
     draftState.active && draftState.owner === ownerId && draft.boardId === boardId;
+  // the widget's empty state opens the create sheet directly
+  useMarkInteractive(draftMatches);
 
   // a swipe-down or any other removal of a dirty sheet must confirm first
   usePreventRemove(scope.active && !completed && (saving || attempt !== null || (draftMatches && draft.dirty)), ({ data }) => {

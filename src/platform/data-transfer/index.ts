@@ -3,6 +3,7 @@ import * as Sharing from 'expo-sharing';
 
 import type { DomainResult } from '@/core/domain/result';
 import { err, ok } from '@/core/domain/result';
+import { reportHandledError } from '@/platform/diagnostics';
 
 // device-side file plumbing for export and import; all product decisions
 // stay in the core - this module only moves bytes
@@ -25,6 +26,7 @@ export async function saveAndShareExport(
     });
     return ok(undefined);
   } catch (cause) {
+    reportHandledError('export', cause);
     return err(
       'database',
       `The export could not be shared: ${cause instanceof Error ? cause.message : String(cause)}`,
@@ -56,6 +58,7 @@ export async function pickImportFile(): Promise<DomainResult<PickedImportFile | 
     const contents = await picked.result.text();
     return ok({ name: picked.result.name, contents });
   } catch (cause) {
+    reportHandledError('import', cause);
     return err(
       'database',
       `The file could not be read: ${cause instanceof Error ? cause.message : String(cause)}`,

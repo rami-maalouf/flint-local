@@ -3,6 +3,7 @@ import * as SQLite from 'expo-sqlite';
 import { Platform } from 'react-native';
 
 import type { SqlDatabase } from '@/core/persistence/database';
+import { reportHandledError } from '@/platform/diagnostics';
 
 export const productDatabaseName = 'ripples.db';
 export const appGroupId = 'group.studio.orbitlabs.habitsystem';
@@ -17,7 +18,9 @@ export function productDatabaseDirectory(): string | undefined {
   try {
     const container = Paths.appleSharedContainers?.[appGroupId];
     return container?.uri ?? undefined;
-  } catch {
+  } catch (cause) {
+    // the app then opens a database the widget extension cannot see
+    reportHandledError('persistence', cause);
     return undefined;
   }
 }
@@ -39,9 +42,11 @@ function relocateLegacyDatabase(containerUri: string): void {
         source.move(new File(containerUri, `${productDatabaseName}${suffix}`));
       }
     }
-  } catch {
+  } catch (cause) {
     // a failed move leaves the legacy files untouched; the open below then
-    // starts fresh in the shared container rather than crashing
+    // starts fresh in the shared container rather than crashing. the person
+    // sees an empty app, so this must be visible in diagnostics
+    reportHandledError('persistence', cause);
   }
 }
 

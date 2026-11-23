@@ -3,6 +3,7 @@ import type { ClaimRewardInput, ClaimRewardResult } from '@/core/domain/reward-c
 import type { DomainError } from '@/core/domain/result';
 import type { RewardId } from '@/core/domain/ids';
 import type { ProductCore } from '@/platform/database/product-core';
+import { reportHandledError } from '@/platform/diagnostics';
 
 export type ClaimOwner = { active: boolean };
 type ClaimState = {
@@ -69,7 +70,10 @@ class ClaimStore {
         attempt: result.error.retryable ? attempt : null, rewardId: result.error.retryable ? attempt.rewardId : null,
         error: result.error });
     } catch (cause) {
-      if (operation === this.operation) this.publish({ phase: 'uncertain', error: claimError(cause) });
+      if (operation === this.operation) {
+        reportHandledError('rewards', cause);
+        this.publish({ phase: 'uncertain', error: claimError(cause) });
+      }
     } finally {
       // submitted work can settle after navigation; the rest of the app still needs fresh totals.
       const callbacks = new Set([...this.invalidators].map(entry => entry.callback));

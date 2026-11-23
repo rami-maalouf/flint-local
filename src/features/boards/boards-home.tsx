@@ -11,6 +11,7 @@ import type { BoardId, CheckInId, CommandId } from '@/core/domain/ids';
 import type { HomeBoardCard } from '@/core/domain/queries';
 import { getDailyToggleSnapshot, getHomeBoardProjection } from '@/core/domain/queries';
 import { triggerActionHaptic } from '@/foundation/haptics';
+import { reportHandledError, useMarkInteractive } from '@/platform/diagnostics';
 import { semanticColor, semanticFallbacks, spacing } from '@/theme';
 
 import { BoardCard } from './board-card';
@@ -51,6 +52,8 @@ export function BoardsHomeScreen() {
   );
 
   const boards = useProductQuery((c) => getHomeBoardProjection(c), []);
+  // home is the launch screen: its boards (or the empty state) are tappable
+  useMarkInteractive(boards.status === 'ready');
   const [editMode, setEditMode] = useState(false);
   const [layoutMode, setLayoutMode] = useState(false);
   const layoutPreference = useBoardLayout();
@@ -164,8 +167,8 @@ export function BoardsHomeScreen() {
           }
         });
       }
-    } catch {
-      if (isCurrent()) setQuickError('Could not update this habit. Try again.');
+    } catch (cause) {
+      if (isCurrent()) { reportHandledError('check-ins', cause); setQuickError('Could not update this habit. Try again.'); }
       invalidate();
     } finally { releaseBoard(boardId); }
   }, [clearUndo, invalidate, isCurrent, nextCommandId, offerUndo, releaseBoard, scope]);
@@ -185,8 +188,8 @@ export function BoardsHomeScreen() {
         invalidate();
         if (!result.ok && isCurrent()) setQuickError(result.error.message);
       });
-    } catch {
-      if (isCurrent()) setQuickError('Could not undo this check-in. Try again.');
+    } catch (cause) {
+      if (isCurrent()) { reportHandledError('check-ins', cause); setQuickError('Could not undo this check-in. Try again.'); }
       invalidate();
     } finally { undoPending.current = false; releaseBoard(target.boardId); }
   }, [clearUndo, invalidate, isCurrent, nextCommandId, releaseBoard, scope]);

@@ -11,6 +11,7 @@ import { refreshWidgetProjection } from '@/core/domain/widget-projection';
 import type { DomainError } from '@/core/domain/result';
 import type { ProductCore } from '@/platform/database/product-core';
 import { getProductCore } from '@/platform/database/product-core';
+import { reportHandledError } from '@/platform/diagnostics';
 import {
   installNotificationHandler,
   addNotificationDestinationListener,
@@ -131,11 +132,18 @@ export function RealProductProvider({ children, coreOverride, syncTransportOverr
       opening.current = { attempt, promise: host.track(async () => {
         try {
           const result = await getProductCore();
-          if (!result.ok) return { status: 'error', error: result.error };
+          if (!result.ok) {
+            // open and migration failures carry system text (sqlite errors,
+            // migration versions), never user content
+            reportHandledError('persistence',
+              new Error(`product database could not be opened (${result.error.code}): ${result.error.message}`));
+            return { status: 'error', error: result.error };
+          }
           const opened = ready(result.value);
           host.attach(opened.owner);
           return opened;
         } catch (cause) {
+          reportHandledError('persistence', cause);
           return { status: 'error', error: { code: 'database', retryable: true,
             message: cause instanceof Error ? cause.message : String(cause) } };
         }
@@ -196,7 +204,10 @@ export function RealProductProvider({ children, coreOverride, syncTransportOverr
       const delay = result.value.expiresAtUtc - core.clock.nowUtcMs();
       if (delay > 0) await refreshWidgets(result.value);
       if (isCurrent()) timer = setTimeout(invalidate, Math.max(0, delay));
-    }).catch(retry);
+    }).catch((cause: unknown) => {
+      if (isCurrent()) reportHandledError('widgets', cause);
+      retry();
+    });
     return host.retain(() => {
       cancelled = true;
       if (timer !== null) {
@@ -246,7 +257,10 @@ export function RealProductProvider({ children, coreOverride, syncTransportOverr
         } else {
           router.navigate(`/boards/${boardId}/check-ins/new?source=widget`);
         }
-      }).catch(() => {});
+      }).catch((cause: unknown) => {
+        // a widget press that fails here leaves no visible trace in the app
+        if (!cancelled && host.isCurrent(revision)) reportHandledError('widgets', cause);
+      });
     });
     return host.retain(() => { cancelled = true; remove(); });
   }, [host, revision, invalidate, state]);

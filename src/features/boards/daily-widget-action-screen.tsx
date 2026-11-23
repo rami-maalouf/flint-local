@@ -12,6 +12,7 @@ import type { DailyToggleSnapshot, QueryDeps } from '@/core/domain/queries';
 import type { DomainResult } from '@/core/domain/result';
 import { ok } from '@/core/domain/result';
 import { triggerActionHaptic } from '@/foundation/haptics';
+import { reportHandledError, useMarkInteractive } from '@/platform/diagnostics';
 import { semanticColor, spacing } from '@/theme';
 
 import { confirmDailyUncheck } from './confirm-daily-uncheck';
@@ -64,6 +65,8 @@ function DailyWidgetActionBody({ boardId }: { boardId: BoardId }) {
   const scheme = useScheme();
   const { scope, invalidate, nextCommandId } = useProduct();
   const state = useProductQuery((deps) => getActionState(deps, boardId), [boardId]);
+  // the widget's quick action opens this screen directly
+  useMarkInteractive(state.status === 'ready');
   const pendingRef = useRef(false);
   const mounted = useRef(true);
   const [pending, setPending] = useState(false);
@@ -147,8 +150,8 @@ function DailyWidgetActionBody({ boardId }: { boardId: BoardId }) {
           await triggerActionHaptic();
         }
       });
-    } catch {
-      if (isCurrent()) setError('Could not update this habit. Try again.');
+    } catch (cause) {
+      if (isCurrent()) { reportHandledError('check-ins', cause); setError('Could not update this habit. Try again.'); }
       invalidate();
     } finally {
       pendingRef.current = false;
@@ -169,8 +172,8 @@ function DailyWidgetActionBody({ boardId }: { boardId: BoardId }) {
         invalidate();
         if (!result.ok && isCurrent()) setError(result.error.message);
       });
-    } catch {
-      if (isCurrent()) setError('Could not undo this check-in. Try again.');
+    } catch (cause) {
+      if (isCurrent()) { reportHandledError('check-ins', cause); setError('Could not undo this check-in. Try again.'); }
       invalidate();
     } finally {
       pendingRef.current = false;

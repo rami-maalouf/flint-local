@@ -20,6 +20,7 @@ import type { BoardId, CheckInId, LogicalDate } from '@/core/domain/ids';
 import type { DomainError } from '@/core/domain/result';
 import { getBoard, getCheckIn } from '@/core/domain/queries';
 import { minimumTouchTarget } from '@/foundation/accessibility';
+import { reportHandledError, useMarkInteractive } from '@/platform/diagnostics';
 import { radius, radiusCurve, semanticColor, spacing } from '@/theme';
 
 import { BoardSymbol, deriveBoardColors } from '../boards';
@@ -150,6 +151,8 @@ export function CheckInFormScreen({ boardId, checkInId, source = 'app' }: CheckI
   // archival and resumed record changes; definitive failures release it.
   const board = retained ? { status: 'ready' as const, value: retained.board } : boardQuery;
   const existing = retained ? { status: 'ready' as const, value: retained.record } : existingQuery;
+  // reminder notifications and count widgets open this sheet directly
+  useMarkInteractive(board.status === 'ready' && (!checkInId || existing.status === 'ready'));
 
   // a pan-down or backdrop tap already dismissed the native sheet; either
   // leave the route, or reopen the sheet when unsaved edits need a decision
@@ -421,8 +424,11 @@ function CheckInFormBody({
           }
           if (result.error.code === 'conflict') { onConflict(); invalidate(); }
         }
-      } catch {
-        if (mounted.current) setError({ code: 'database', message: 'The saved result could not be confirmed. Retry to check it.', retryable: true });
+      } catch (cause) {
+        if (mounted.current) {
+          reportHandledError('check-ins', cause);
+          setError({ code: 'database', message: 'The saved result could not be confirmed. Retry to check it.', retryable: true });
+        }
       } finally {
         busyRef.current = false;
         if (mounted.current) setSaving(false);

@@ -2,6 +2,7 @@ import { getSyncSummary } from '@/core/domain/queries';
 import { runSync, type SyncStatus } from '@/core/sync/engine';
 import { SyncTransportError, type SyncTransport, type WireSyncRecord } from '@/core/sync/transport';
 import type { ProductCore } from '@/platform/database/product-core';
+import { reportHandledError } from '@/platform/diagnostics';
 
 export type SyncSnapshot = { status: SyncStatus; busy: boolean; error: string | null };
 export const INITIAL_SYNC: SyncSnapshot = { status: 'idle', busy: false, error: null };
@@ -90,7 +91,7 @@ export class SyncCoordinator {
       try {
         const summary = await getSyncSummary(this.core);
         if (this.disposed || generation !== this.generation) continue;
-        if (!summary.ok) throw new Error('sync settings unavailable');
+        if (!summary.ok) throw new Error(`sync settings unavailable: ${summary.error.code}`);
         enabled = summary.value.enabled;
         if (summary.value.enabled) this.publish({ status: 'syncing', busy: true, error: null });
         const result = await runSync({
@@ -98,14 +99,17 @@ export class SyncCoordinator {
           shouldContinue: () => !this.disposed && !this.paused && generation === this.generation,
         });
         if (this.disposed || generation !== this.generation) continue;
-        if (!result.ok) throw new Error('sync unavailable');
+        if (!result.ok) throw new Error(`sync unavailable: ${result.error.code}`);
         this.publish({ status: result.value.status, busy: false, error: null });
         if (summary.value.enabled || result.value.localChanged) this.refreshQueries();
         if (result.value.retryAfterMs !== null && !this.pending) {
           this.retry = setTimeout(() => { void this.request(); }, result.value.retryAfterMs);
         }
-      } catch {
+      } catch (cause) {
         if (!this.disposed && generation === this.generation) {
+          // transport outcomes (offline, signed out) arrive as statuses; only
+          // local failures and unexpected throws reach this point
+          reportHandledError('sync', cause);
           this.publish({ status: 'needs_attention', busy: false, error: 'Sync could not finish. Try again.' });
           // recovery or earlier pages can commit before later retry metadata fails.
           if (enabled) this.refreshQueries();

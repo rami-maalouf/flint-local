@@ -6,6 +6,7 @@ import { AppText } from '@/components/foundation/app-text';
 import type { ImportSummary } from '@/core/domain/commands';
 import type { ImportDraft, ImportPreview } from '@/core/export/import-parsers';
 import { getImportPreview, parseOwnExport, parseRipplesCsv } from '@/core/export/import-parsers';
+import { reportHandledError } from '@/platform/diagnostics';
 import { radius, radiusCurve, semanticColor, spacing } from '@/theme';
 
 import { InlineError, PrimaryButton, useScheme } from '../ui';
@@ -103,8 +104,11 @@ function ImportBody() {
         const preview: ImportState = { step: 'preview', fileName: picked.value.name, draft: parsed.value, counts: counts.value };
         selection.current = preview;
         setState(preview);
-      } catch {
-        if (scope.isCurrent() && current.active) setPickError('The file could not be read. Try again.');
+      } catch (cause) {
+        if (scope.isCurrent() && current.active) {
+          reportHandledError('import', cause);
+          setPickError('The file could not be read. Try again.');
+        }
       } finally {
         if (picking.current === current) picking.current = null;
       }
@@ -127,8 +131,11 @@ function ImportBody() {
         }
         await pending;
       }
-    } catch {
-      if (scope.isCurrent() && current.active) setPickError('The import could not be started. Try again.');
+    } catch (cause) {
+      if (scope.isCurrent() && current.active) {
+        reportHandledError('import', cause);
+        setPickError('The import could not be started. Try again.');
+      }
     }
   }, [store, scope, owner, invalidate, nextCommandId, state, attempt]);
 

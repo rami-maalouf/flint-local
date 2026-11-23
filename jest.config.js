@@ -34,6 +34,8 @@ module.exports = {
     '^@expo/ui/swift-ui$': '<rootDir>/src/testing/expo-ui-swift.mock.tsx',
     '^@expo/ui/swift-ui/modifiers$': '<rootDir>/src/testing/expo-ui-swift.mock.tsx',
     '^expo-notifications$': '<rootDir>/src/testing/expo-notifications.mock.ts',
+    // reviewed behavior-focused mock: expo-observe requires its native module
+    '^expo-observe$': '<rootDir>/src/testing/expo-observe.mock.tsx',
     '^@/platform/data-transfer$': '<rootDir>/src/testing/data-transfer.mock.ts',
     '^@/platform/notifications$': '<rootDir>/src/testing/notifications-platform.mock.ts',
     '^@/platform/widgets$': '<rootDir>/src/testing/widgets-platform.mock.ts',

@@ -5,6 +5,7 @@ import { reconcileReminderSchedules } from '@/core/domain/reminder-commands';
 import type { CommandId } from '@/core/domain/ids';
 import type { MissAlertScheduler, ReminderScheduler } from '@/core/domain/ports';
 import type { ProductCore } from '@/platform/database/product-core';
+import { reportHandledError } from '@/platform/diagnostics';
 
 export class NotificationCoordinator {
   private disposed = false;
@@ -81,7 +82,10 @@ export class NotificationCoordinator {
       this.remindersRequested = false;
       if (reminders) {
         const result = await reconcileReminderSchedules({ ...this.core, scheduler: this.reminders },
-          { commandId: this.core.ids.uuid() as CommandId }).catch(() => null);
+          { commandId: this.core.ids.uuid() as CommandId }).catch((cause: unknown) => {
+            if (isCurrent()) reportHandledError('notifications', cause);
+            return null;
+          });
         if (isCurrent() && result?.ok && result.value.updated > 0) this.remindersChanged();
       }
       if (!isCurrent()) continue;
