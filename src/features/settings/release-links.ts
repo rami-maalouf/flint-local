@@ -1,7 +1,4 @@
-// validated https release links. a key without a value shows the spec's
-// explicit missing-link state instead of a dead tap; nothing else enforces
-// them. the app store review and more-products links wait for the app store
-// app id, which exists only after the app store connect record is created.
+// keep the rating action hidden until the app's store listing is public.
 
 export type ReleaseLinkKey =
   | 'feedback'
@@ -13,7 +10,7 @@ export type ReleaseLinkKey =
 const RELEASE_LINKS: Record<ReleaseLinkKey, string | null> = {
   feedback: 'https://flint.orbitlabs.studio/support',
   appStoreReview: null,
-  moreProducts: null,
+  moreProducts: 'https://apps.apple.com/developer/rami-maalouf/id1783932552',
   privacyPolicy: 'https://flint.orbitlabs.studio/privacy',
   // the website has no terms of its own; apple's standard eula applies
   termsOfUse: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
