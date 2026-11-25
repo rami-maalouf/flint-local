@@ -37,7 +37,7 @@ cd brand && bun install && bun run render
 
 ## Launch
 
-The launch flame stays up until home has its habits to show (`src/platform/launch-screen.ts`), then fades over 350 ms. It never stays longer than four seconds.
+The native launch screen fades as navigation mounts. The same flame stays centered while Flint opens the database and loads the first boards.
 
 ## Names
 
