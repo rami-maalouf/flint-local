@@ -3968,3 +3968,9 @@ On the same build the app showed: the aurora icon named Flint on the Home Screen
 Flint Local keeps its aurora flame visible while the database opens and the first boards load. Expo Router hands off the native splash when navigation is ready. The branded loading surface covers both stages, and the database failure screen remains usable without a fixed splash delay. The regression initially failed on the empty database loading view and now also covers the board-query loading stage, the empty board list and recovery.
 
 A fresh arm64 Release build on the iPhone 17 Pro simulator running iOS 26.5 showed the aurora flame in light and dark mode, faded into Home and opened Settings on a cold URL launch after the iOS confirmation. The recordings are under `.artifacts/launch-fix/`. Independent review, `bun run validate` (215 suites and 3,131 tests) and `bun run test:native` passed. Coverage ran on Node 24.22.2 with its output on the external build volume.
+
+## App Store links in Settings (2026-11-24)
+
+- Open the public developer page with the system link handler. Show the rating action once this app's public App Store review URL is configured.
+- Reproduced the missing-link notice on iOS before the fix. Tested the candidate JavaScript in the Release simulator shell on iPhone 17 Pro / iOS 26.5. The Settings layout showed no rating row, and the developer link opened Rami Maalouf's App Store page in Safari.
+- Regression tests cover the unpublished rating action, developer link routing, and configured rating links. `bun run validate` and `bun run test:native` passed. An independent review found no merge blockers.
